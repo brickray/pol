@@ -1,0 +1,191 @@
+#include "scene.h"
+
+namespace pol {
+	Scene::Scene() {
+		camera = nullptr;
+		sampler = nullptr;
+		integrator = nullptr;
+		accelerator = nullptr;
+	}
+
+	Scene::~Scene() {
+		POL_SAFE_DELETE(camera);
+		POL_SAFE_DELETE(sampler);
+		POL_SAFE_DELETE(integrator);
+		POL_SAFE_DELETE(accelerator);
+
+		for (Texture* texture : textures) POL_SAFE_DELETE(texture);
+		for (Bsdf* bsdf : bsdfs) POL_SAFE_DELETE(bsdf);
+		for (Shape* shape : primitives) POL_SAFE_DELETE(shape);
+		for (Light* light : lights) POL_SAFE_DELETE(light);
+	}
+
+	void Scene::SetCamera(Camera* c) {
+		if (camera) return;
+
+		camera = c;
+	}
+
+	void Scene::SetSampler(Sampler* s) {
+		if (sampler) return;
+
+		sampler = s;
+	}
+
+	void Scene::SetIntegrator(Integrator* i) {
+		if (integrator) return;
+
+		integrator = i;
+	}
+
+	void Scene::SetAccelerator(Accelerator* a) {
+		if (accelerator) return;
+
+		accelerator = a;
+	}
+
+	void Scene::AddPrimitive(Shape* s) {
+		primitives.push_back(s);
+	}
+
+	void Scene::AddLight(Light* l) {
+		lights.push_back(l);
+	}
+
+	void Scene::AddBsdf(Bsdf* b) {
+		bsdfs.push_back(b);
+	}
+
+	void Scene::AddTexture(Texture* t) {
+		textures.push_back(t);
+	}
+
+	void Scene::Prepare(const string& lightStrategy) {
+		//build accelerator
+		if (accelerator) {
+			bool success = accelerator->Build(primitives);
+			if (!success) return;
+			//if nodes count is one,
+			//brute force intersect maybe fast
+			if (accelerator->GetNodesCount() == 1) {
+				POL_SAFE_DELETE(accelerator);
+				accelerator = nullptr;
+			}
+		}
+
+		//construct light distribution.
+		if(lightStrategy == "uniform"){
+			vector<Float> luminance;
+			luminance.reserve(lights.size());
+			for (const Light* light : lights) {
+				luminance.push_back(1);
+			}
+			lightDistribution = Distribution1D(&luminance[0], luminance.size());
+		}
+		else if (lightStrategy == "power") {
+			vector<Float> luminance;
+			luminance.reserve(lights.size());
+			for (const Light* light : lights) {
+				luminance.push_back(light->Luminance());
+			}
+			lightDistribution = Distribution1D(&luminance[0], luminance.size());
+		}
+		else {
+			//unknown
+		}
+	}
+
+	bool Scene::Intersect(Ray& ray, Intersection& isect) const {
+		bool intersect = false;
+		if (accelerator) {
+			intersect = accelerator->Intersect(ray, isect);
+		}
+		else {
+			//brute force
+			for (const Shape* shape : primitives) {
+				intersect |= shape->Intersect(ray, isect);
+			}
+		}
+
+		isect.geoFrame = Frame(isect.n);
+		isect.shFrame = isect.geoFrame;
+
+		return intersect;
+	}
+
+	bool Scene::Occluded(const Ray& ray) const {
+		if (accelerator) {
+			return accelerator->Occluded(ray);
+		}
+		else {
+			//brute force
+			for (const Shape* shape : primitives) {
+				if (shape->Occluded(ray))
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	void Scene::Render() const {
+		Film* film = camera->GetFilm();
+		Sampler* sampler = this->sampler;
+		int sampleCount = sampler->GetSampleCount();
+
+		for (int i = 0; i < film->res.x; ++i) {
+			for (int j = 0; j < film->res.y; ++j) {
+				sampler->Prepare(j * film->res.x + i);
+				Vector3f color(0);
+				for (int s = 0; s < sampleCount; ++s) {
+					Vector2f offset = sampler->Next2D() - Vector2f(0.5);
+					Vector2f sample = Vector2f(i, j) + offset;
+					Ray ray = camera->GenerateRay(sample, sampler->Next2D());
+		
+					color += integrator->Li(ray, *this, sampler);
+				}
+
+				color /= Float(sampleCount);
+				film->AddPixel(Vector2f(i, j), color);
+			}
+
+			printf("Rendering Progress[%.3f%%]\r", Float(i) / (film->res.x - 1) * 100);
+		}
+
+		film->WriteImage();
+	}
+
+	//return a brief string summary of the instance(for debugging purposes)
+	string Scene::ToString() const {
+		string ret;
+		string null = "nullptr";
+
+		ret += "Scene[\n";
+		//accelerator
+		ret += "  Accelerator = " + (accelerator != nullptr ? indent(accelerator->ToString()) : null) + ",\n";
+		//camera
+		ret += "  Camera = " + indent(camera->ToString()) + ",\n";
+		//sampler
+		ret += "  Sampler = " + indent(sampler->ToString()) + ",\n";
+		//integrator
+		ret += "  Integrator = " + indent(integrator->ToString()) + ",\n";
+		//lights
+		ret += "  Lights = [\n";
+		for (const Light* light : lights) {
+			ret += "    " + indent(light->ToString(), 4);
+			ret += "\n";
+		}
+		ret += "  ]\n";
+		//primitives
+		ret += "  Primitives = [\n";
+		for (const Shape* shape : primitives) {
+			ret += "    " + indent(shape->ToString(), 4);
+			ret += "\n";
+		}
+		ret += "  ]\n";
+		ret += "]\n";
+		
+
+		return ret;
+	}
+}
