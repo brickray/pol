@@ -5,7 +5,7 @@ namespace pol {
 	//direct integrator is aimed to solve equation 
 	//    Li = Le + ¡ÒFr*Le*cos(t)*dw
 	//Le is direct illumination from light
-	Vector3f Direct::Li(const Ray& ray, const Scene& scene, const Sampler* sampler) const {
+	Vector3f Direct::Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const {
 		Vector3f L(0);
 		Ray r = ray;
 
@@ -15,6 +15,9 @@ namespace pol {
 			//background
 			return L;
 		}
+
+		//prepare differentials 
+		isect.ComputeDifferentials(ray);
 
 		Vector3f in = -r.d;
 		Vector3f localIn = isect.shFrame.ToLocal(in);

@@ -6,6 +6,7 @@ namespace pol {
 
 	}
 
+	//dielectic is a delta bsdf
 	bool Dielectric::IsDelta() const {
 		return true;
 	}
@@ -26,7 +27,7 @@ namespace pol {
 			//calculate reflection direction
 			Vector3f reflectDir = Vector3f(-in.x, in.y, -in.z);
 			out = reflectDir;
-			fr = specular->Evaluate(isect.uv) / isect.shFrame.CosTheta(out);
+			fr = specular->Evaluate(isect) / isect.shFrame.CosTheta(out);
 			pdf = 1;
 			return;
 		}
@@ -39,7 +40,7 @@ namespace pol {
 			//calculate reflection direction
 			Vector3f reflectDir = Vector3f(-in.x, in.y, -in.z);
 			out = reflectDir;
-			fr = fresnel * specular->Evaluate(isect.uv) / abs(cosi);
+			fr = fresnel * specular->Evaluate(isect) / abs(cosi);
 			pdf = fresnel;
 		}
 		else {
@@ -49,7 +50,7 @@ namespace pol {
 			Vector3f refractDir = Vector3f(-in.x * eta, cost, -in.z * eta);
 		
 			out = refractDir;
-			fr = (1 - fresnel) * eta * eta * specular->Evaluate(isect.uv) / abs(cost);
+			fr = (1 - fresnel) * eta * eta * specular->Evaluate(isect) / abs(cost);
 			pdf = 1 - fresnel;
 		}
 	}

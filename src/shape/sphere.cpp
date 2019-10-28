@@ -58,14 +58,46 @@ namespace pol {
 		if (v < 0) v += TWOPI;
 		v *= INV2PI;
 
+		//x = r*sin(theta)*cos(phi)
+		//y = r*cos(theta)
+		//z = r*sin(theta)*sin(phi)
+		//u = theta / pi
+		//v = phi / (2*pi)
+		//assume r is one, thus
+		//x = sin(u*pi)*cos(2*pi*v)
+		//y = cos(u*pi)
+		//z = sin(u*pi)*sin(2*pi*v)
+		//dxdu = cos(u*pi)*pi*cos(2*pi*v)
+		//dydu = -sin(u*pi)*pi
+		//dzdu = cos(u*pi)*pi*sin(2*pi*v)
+		//dxdv = -sin(u*pi)*sin(2*pi*v)*2*pi
+		//dydv = 0
+		//dzdv = sin(u*pi)*cos(2*pi*v)*2*pi
+		Float costheta = isect.shFrame.CosTheta(pHit);
+		Float sintheta = isect.shFrame.SinTheta(pHit);
+		Float cosphi = isect.shFrame.CosPhi(pHit);
+		Float sinphi = isect.shFrame.SinPhi(pHit);
+		//calculate partial derivative of p to u
+		Float dxdu = costheta * PI * cosphi;
+		Float dydu = -sintheta * PI;
+		Float dzdu = costheta * PI * sinphi;
+		//calculate partial derivative of p to v
+		Float dxdv = -sintheta * sinphi * TWOPI;
+		Float dydv = 0;
+		Float dzdv = sintheta * cosphi * TWOPI;
+
 		//intersect
-		//record intersection information if needed
+		//record intersect information if needed
 		ray.tmax = t;
 		isect.p = ray(t);
 		isect.n = world.TransformNormal(pHit);
 		isect.uv = Vector2f(u, v);
+		isect.dpdu = Vector3f(dxdu, dydu, dzdu);
+		isect.dpdv = Vector3f(dxdv, dydv, dzdv);
 		isect.bsdf = const_cast<Bsdf*>(bsdf);
 		isect.light = light;
+		//transform the Intersection
+		isect(world);
 
 		return true;
 	}

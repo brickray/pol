@@ -1,6 +1,7 @@
 #pragma once
 
 #include "object.h"
+#include "intersection.h"
 
 namespace pol {
 	class Texture : public PolObject {
@@ -8,6 +9,6 @@ namespace pol {
 		Texture() {}
 		virtual ~Texture() {}
 
-		virtual Vector3f Evaluate(const Vector2f& uv) const = 0;
+		virtual Vector3f Evaluate(const Intersection& isect) const = 0;
 	};
 }

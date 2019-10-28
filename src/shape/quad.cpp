@@ -37,13 +37,35 @@ namespace pol {
 		Float u = (pHit.x + 1) / 2;
 		Float v = (pHit.z + 1) / 2;
 
+		//x = 2*u - 1
+		//y = 0
+		//z = 2*v - 1
+		//dxdu = 2
+		//dydu = 0
+		//dzdu = 0
+		//dxdv = 0
+		//dydv = 0
+		//dzdv = 2
+		//calculate partial derivative of p to u
+		Float dxdu = 2;
+		Float dydu = 0;
+		Float dzdu = 0;
+		//calculate partial derivative of p to v
+		Float dxdv = 0;
+		Float dydv = 0;
+		Float dzdv = 2;
+
 		//record intersect information
 		ray.tmax = t;
 		isect.p = ray(t);
 		isect.n = normal;
 		isect.uv = Vector2f(u, v);
+		isect.dpdu = Vector3f(dxdu, dydu, dzdu);
+		isect.dpdv = Vector3f(dxdv, dydv, dzdv);
 		isect.bsdf = const_cast<Bsdf*>(bsdf);
 		isect.light = light;
+		//transform the Intersection
+		isect(world);
 
 		return true;
 	}
@@ -80,6 +102,7 @@ namespace pol {
 		string ret;
 		ret += "Quad[\n  world = " + indent(world.ToString())
 			+ ",\n" + "  bsdf = " + indent(bsdf->ToString())
+			+ ",\n  normal = " + normal.ToString()
 			+ "\n]";
 		
 		return ret;

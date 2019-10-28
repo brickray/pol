@@ -10,9 +10,9 @@
 
 namespace pol {
 
-	bool ImageIO::LoadTexture(const char* filename, int& width, int& height, bool srgb, vector<Vector4f>& output) {
+	bool ImageIO::LoadTexture(const char* filename, int& width, int& height, bool srgb, vector<Vector3f>& output) {
 		int component;
-		stbi_set_flip_vertically_on_load(true);
+		stbi_set_flip_vertically_on_load(false);
 		unsigned char* tex = stbi_load(filename, &width, &height, &component, 0);
 		if (tex) {
 			output.resize(width * height);
@@ -23,28 +23,28 @@ namespace pol {
 					int idx = s * width + t;
 					//int inverseIdx = (height - s - 1)*width + t;
 
-					Vector4f texel;
+					Vector3f texel;
 					if (component == 1) {
 						float r = tex[idx] * inv;
-						texel = Vector4f(r, r, r, 1);
+						texel = Vector3f(r, r, r);
 					}
 					else if (component == 3) {
 						float r = tex[3 * idx] * inv;
 						float g = tex[3 * idx + 1] * inv;
 						float b = tex[3 * idx + 2] * inv;
-						texel = Vector4f(r, g, b, 1);
+						texel = Vector3f(r, g, b);
 					}
 					else if (component == 4) {
 						float r = tex[4 * idx] * inv;
 						float g = tex[4 * idx + 1] * inv;
 						float b = tex[4 * idx + 2] * inv;
 						float a = tex[4 * idx + 3] * inv;
-						texel = Vector4f(r, g, b, a);
+						texel = Vector3f(r, g, b);
 					}
 
 					//convert from srgb space to linear space
 					if (srgb)
-						output[idx] = Vector4f(powf(texel.x, 2.2f), powf(texel.y, 2.2f), powf(texel.z, 2.2f), texel.w);
+						output[idx] = Vector3f(powf(texel.x, 2.2f), powf(texel.y, 2.2f), powf(texel.z, 2.2f));
 					else
 						output[idx] = texel;
 				}
@@ -61,6 +61,25 @@ namespace pol {
 	}
 
 	bool ImageIO::SavePng(const char* filename, int width, int height, const vector<Vector3f>& input) {
+		unsigned char* transform = new unsigned char[width * height * 3];
+		for (int i = 0; i < height; ++i) {
+			for (int j = 0; j < width; ++j) {
+				unsigned pixel = i * width + j;
+				unsigned inverse = (height - i - 1) * width + j;
+				transform[3 * pixel] = unsigned(Clamp(input[inverse].x, 0.f, 1.f) * 255.f);
+				transform[3 * pixel + 1] = unsigned(Clamp(input[inverse].y, 0.f, 1.f) * 255.f);
+				transform[3 * pixel + 2] = unsigned(Clamp(input[inverse].z, 0.f, 1.f) * 255.f);
+			}
+		}
+
+		stbi_write_png(filename, width, height, 3, transform, 0);
+
+		delete[] transform;
+
+		return true;
+	}
+
+	bool ImageIO::SavePng(const char* filename, int width, int height, const Vector3f* input) {
 		unsigned char* transform = new unsigned char[width * height * 3];
 		for (int i = 0; i < height; ++i) {
 			for (int j = 0; j < width; ++j) {

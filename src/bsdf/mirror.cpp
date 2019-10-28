@@ -6,13 +6,14 @@ namespace pol {
 
 	}
 
+	//specular reflection bsdf is a delta bsdf
 	bool Mirror::IsDelta() const {
 		return true;
 	}
 
 	void Mirror::SampleBsdf(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& out, Vector3f& fr, Float& pdf) const {
 		out = Vector3f(-in.x, in.y, -in.z);
-		fr = specular->Evaluate(isect.uv) / isect.shFrame.CosTheta(out);
+		fr = specular->Evaluate(isect) / isect.shFrame.CosTheta(out);
 		pdf = 1;
 	}
 

@@ -11,7 +11,7 @@ namespace pol {
 	//         Li = 1/pi¡ÒV(p)cos(t)dw
 	//where V(p) is visibility function.
 	//V(p) = 1 if visible and 0 otherwise
-	Vector3f Ao::Li(const Ray& ray, const Scene& scene, const Sampler* sampler) const {
+	Vector3f Ao::Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const {
 		Vector3f L(0);
 
 		Ray r = ray;

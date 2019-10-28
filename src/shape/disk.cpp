@@ -30,17 +30,46 @@ namespace pol {
 		if (lensq > radius* radius) return false;
 
 		//calc uv
-		Float u = lensq / (radius * radius);
+		Float u = sqrt(lensq) / radius;
 		Float v = atan2(pHit.z, pHit.x);
 		if (v < 0) v += TWOPI;
 		v *= INV2PI;
+
+		//x = r*cos(phi)
+		//y = 0
+		//z = r*sin(phi)
+		//u = r/rmax
+		//v = phi/(2*pi)
+		//x = rmax*u*cos(2*pi*v)
+		//y = 0
+		//z = rmax*u*sin(2*pi*v)
+		//dxdu = rmax*cos(2*pi*v)
+		//dydu = 0
+		//dzdu = rmax*sin(2*pi*v)
+		//dxdv = -rmax*u*sin(2*pi*v)*2*pi
+		//dydv = 0
+		//dzdv = rmax*u*cos(2*pi*v)*2*pi
+		Float cosphi = isect.shFrame.CosPhi(pHit);
+		Float sinphi = isect.shFrame.SinPhi(pHit);
+		//calculate partial derivative of p to u
+		Float dxdu = radius * cosphi;
+		Float dydu = 0;
+		Float dzdu = radius * sinphi;
+		//calculate partial derivative of p to v
+		Float dxdv = -radius * u * sinphi * TWOPI;
+		Float dydv = 0;
+		Float dzdv = radius * u * cosphi * TWOPI;
 
 		//record intersect information
 		isect.p = ray(t);
 		isect.n = normal;
 		isect.uv = Vector2f(u, v);
+		isect.dpdu = Vector3f(dxdu, dydu, dzdu);
+		isect.dpdv = Vector3f(dxdv, dydv, dzdv);
 		isect.bsdf = const_cast<Bsdf*>(bsdf);
 		isect.light = light;
+		//transform the Intersection
+		isect(world);
 
 		return true;
 	}
@@ -76,6 +105,7 @@ namespace pol {
 		ret += "Disk[\n  world = " + indent(world.ToString())
 			+ ",\n" + "  radius = " + to_string(radius)
 			+ ",\n" + "  bsdf = " + indent(bsdf->ToString())
+			+ ",\n  normal = " + normal.ToString()
 			+ "\n]";
 
 		return ret;

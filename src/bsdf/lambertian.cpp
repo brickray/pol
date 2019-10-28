@@ -13,7 +13,7 @@ namespace pol {
 	void Lambertian::SampleBsdf(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& out, Vector3f& fr, Float& pdf) const {
 		out = Warp::CosineHemiSphere(u);
 		pdf = Warp::CosineHemiSpherePdf(out);
-		fr = diffuse->Evaluate(isect.uv) * Float(INVPI);
+		fr = diffuse->Evaluate(isect) * Float(INVPI);
 
 		if (!(isect.shFrame.CosTheta(in) * isect.shFrame.CosTheta(out) > 0))
 			out = -out;
@@ -25,7 +25,7 @@ namespace pol {
 			return;
 		}
 
-		fr = diffuse->Evaluate(isect.uv) * Float(INVPI);
+		fr = diffuse->Evaluate(isect) * Float(INVPI);
 		pdf = isect.shFrame.CosTheta(out) * INVPI;
 	}
 

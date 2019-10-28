@@ -13,7 +13,7 @@ namespace pol {
 
 		}
 
-		Vector3f Evaluate(const Vector2f& uv) const {
+		Vector3f Evaluate(const Intersection& isect) const {
 			return value;
 		}
 

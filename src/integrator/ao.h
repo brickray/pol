@@ -10,7 +10,7 @@ namespace pol {
 	public:
 		Ao(Float maxDist);
 
-		virtual Vector3f Li(const Ray& ray, const Scene& scene, const Sampler* sampler) const;
+		virtual Vector3f Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const;
 
 		virtual string ToString() const;
 	};

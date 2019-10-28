@@ -11,7 +11,7 @@ namespace pol {
 	//path integrator is aimed to solve equation 
 	//    Li = Le + ¡ÒFr*Li*cos(t)*dw
 	//Le is direct illumination from light
-	Vector3f Path::Li(const Ray& ray, const Scene& scene, const Sampler* sampler) const {
+	Vector3f Path::Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const {
 		Vector3f L(0);
 		Vector3f beta(1);
 		Ray r = ray;
@@ -23,6 +23,15 @@ namespace pol {
 			if (!found) {
 				//background
 				break;
+			}
+
+			if (bounces == 0) {
+				//prepare differentials 
+				isect.ComputeDifferentials(ray);
+			}
+			else {
+				isect.dudx = isect.dvdx = 0;
+				isect.dudy = isect.dvdy = 0;
 			}
 
 			Vector3f in = -r.d;

@@ -140,7 +140,7 @@ namespace pol {
 				for (int s = 0; s < sampleCount; ++s) {
 					Vector2f offset = sampler->Next2D() - Vector2f(0.5);
 					Vector2f sample = Vector2f(i, j) + offset;
-					Ray ray = camera->GenerateRay(sample, sampler->Next2D());
+					RayDifferential ray = camera->GenerateRayDifferential(sample, sampler->Next2D());
 		
 					color += integrator->Li(ray, *this, sampler);
 				}

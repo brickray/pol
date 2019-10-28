@@ -15,6 +15,15 @@ using namespace std;
 #define POL_ASSERT(cons)  
 #endif
 
+__forceinline float Log2(float x) {
+	static float invLog2 = 1.f / logf(2.f);
+	return logf(x) * invLog2;
+}
+
+__forceinline int Log2Int(float v) {
+	return (int)floorf(Log2(v));
+}
+
 __forceinline Float GetLuminance(const Vector3f & c) {
 	static Vector3f luma(0.212671f, 0.715160f, 0.072169f);
 

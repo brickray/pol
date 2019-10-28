@@ -2,6 +2,7 @@
 
 #include "object.h"
 #include "warp.h"
+#include "ray.h"
 
 namespace pol {
 	//monte carlo method
@@ -50,6 +51,6 @@ namespace pol {
 		Integrator();
 		virtual ~Integrator();
 
-		virtual Vector3f Li(const Ray& ray, const Scene& scene, const Sampler* sampler) const = 0;
+		virtual Vector3f Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const = 0;
 	};
 }

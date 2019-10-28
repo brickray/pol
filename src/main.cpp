@@ -1,6 +1,7 @@
 #include "pol.h"
 #include "core/timer.h"
 #include "core/parallel.h"
+#include "core/ray.h"
 #include "core/scene.h"
 #include "core/distribution.h"
 #include "shape/sphere.h"
@@ -13,33 +14,44 @@
 #include "integrator/path.h"
 #include "bsdf/lambertian.h"
 #include "bsdf/mirror.h"
+#include "bsdf/dielectric.h"
 #include "texture/constant.h"
 #include "texture/checkerboard.h"
+#include "texture/image.h"
 #include "light/point.h"
 #include "light/spot.h"
 #include "light/distant.h"
 #include "light/area.h"
 #include "accelerator/bvh.h"
+#include "core/imageio.h"
+#include "core/memory.h"
+#include "core/mipmap.h"
 
 using namespace pol;
 int main(int argc, char** argv) {
+	int w, h;
+	vector<Vector3f> data;
+	ImageIO::LoadTexture("../lines.png", w, h, true, data);
 	Scene scene;
 	Film* film = CreateFilm("../result.png", Vector2i(512, 512));
 	Camera* camera = CreatePinholeCamera(Lookat(Vector3f(0, 1, 6.8), Vector3f(0, 1, 0), Vector3f(0, 1, 0)),
 		Perspective(19.5, 1, 0.1, 100), film);
 
 	Bvh* accelerator = CreateBvhAccelerator();
-	Sampler* sampler = CreateRandomSampler(64);
+	Sampler* sampler = CreateRandomSampler(1);
 	//Integrator* integrator = CreateAoIntegrator(0.5);
 	//Integrator* integrator = CreateDirectIntegrator();
 	Integrator* integrator = CreatePathIntegrator();
 	Checkerboard* checker = CreateCheckerboardTexture(Vector3f(0.325000, 0.310000, 0.250000),
 		Vector3f(0.725000, 0.710000, 0.680000), 20, 20);
+	Image* concrete = CreateImageTexture(w, h, data, FilterMode::E_TRILINEAR);
 	Constant* general = CreateConstantTexture(Vector3f(0.75, 0.75, 0.75));
 	Constant* red = CreateConstantTexture(Vector3f(0.75, 0.25, 0.25));
 	Constant* blue = CreateConstantTexture(Vector3f(0.25, 0.25, 0.75));
 	Constant* white = CreateConstantTexture(Vector3f::one);
 	Mirror* mirror = CreateMirrorBsdf(white);
+	Dielectric* dielectric = CreateDielectricBsdf(white, 1, 1.5);
+	Lambertian* crete = CreateLambertianBsdf(concrete);
 	Lambertian* matte = CreateLambertianBsdf(general);
 	Lambertian* l = CreateLambertianBsdf(red);
 	Lambertian* r = CreateLambertianBsdf(blue);
@@ -48,11 +60,11 @@ int main(int argc, char** argv) {
 	Spot* spot = CreateSpotLight(Vector3f(2, 2, 2), Vector3f(-0.9, 1.7, 0), Vector3f(0, -1, 0), 20, 15);
 	Distant* distant = CreateDistantLight(Vector3f(2, 2, 2), Vector3f(1, -1, -1));
 
-	Sphere* s = CreateSphereShape(mirror, Vector3f(-0.45, 0.4, -0.1), 0.4);
-	Sphere* s1 = CreateSphereShape(matte, Vector3f(0.45, 0.4, 0.4), 0.4);
+	Sphere* s = CreateSphereShape(crete, Vector3f(-0.45, 0.4, -0.1), 0.25);
+	Sphere* s1 = CreateSphereShape(crete, Vector3f(0.45, 0.4, 0.4), 0.25);
 	Quad* floor = CreateQuadShape(matte, Vector3f(0, 0, 0), Vector3f::zero, Vector3f::one);
 	Quad* ceil = CreateQuadShape(matte, Vector3f(0, 2, 0), Vector3f(180, 0, 0), Vector3f::one);
-	Quad* back = CreateQuadShape(matte, Vector3f(0, 1, -1), Vector3f(90, 0, 0), Vector3f::one);
+	Quad* back = CreateQuadShape(crete, Vector3f(0, 1, -1), Vector3f(90, 0, 0), Vector3f::one);
 	Quad* left = CreateQuadShape(l, Vector3f(-1, 1, 0), Vector3f(0, 0, -90), Vector3f::one);
 	Quad* right = CreateQuadShape(r, Vector3f(1, 1, 0), Vector3f(0, 0, 90), Vector3f::one);
 //	Quad* light = CreateQuadShape(matte, Vector3f(-0.005, 1.98, -0.03), Vector3f(180, 0, 0), Vector3f(0.235, 1, 0.19));
@@ -66,12 +78,15 @@ int main(int argc, char** argv) {
 	scene.SetSampler(sampler);
 	scene.SetIntegrator(integrator);
 	scene.AddTexture(general);
+	scene.AddTexture(concrete);
 	scene.AddTexture(red);
 	scene.AddTexture(blue);
 	scene.AddTexture(white);
 	scene.AddTexture(checker);
 	scene.AddBsdf(mirror);
+	scene.AddBsdf(dielectric);
 	scene.AddBsdf(matte);
+	scene.AddBsdf(crete);
 	scene.AddBsdf(r);
 	scene.AddBsdf(l);
 	scene.AddBsdf(f);
