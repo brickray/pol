@@ -30,6 +30,8 @@ namespace pol {
 				isect.ComputeDifferentials(ray);
 			}
 			else {
+				//only primiary ray using differentials information
+				//so here set all differentials to 0
 				isect.dudx = isect.dvdx = 0;
 				isect.dudy = isect.dvdy = 0;
 			}

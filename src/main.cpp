@@ -15,6 +15,7 @@
 #include "bsdf/lambertian.h"
 #include "bsdf/mirror.h"
 #include "bsdf/dielectric.h"
+#include "bsdf/roughconductor.h"
 #include "texture/constant.h"
 #include "texture/checkerboard.h"
 #include "texture/image.h"
@@ -38,7 +39,7 @@ int main(int argc, char** argv) {
 		Perspective(19.5, 1, 0.1, 100), film);
 
 	Bvh* accelerator = CreateBvhAccelerator();
-	Sampler* sampler = CreateRandomSampler(1);
+	Sampler* sampler = CreateRandomSampler(64);
 	//Integrator* integrator = CreateAoIntegrator(0.5);
 	//Integrator* integrator = CreateDirectIntegrator();
 	Integrator* integrator = CreatePathIntegrator();
@@ -49,8 +50,11 @@ int main(int argc, char** argv) {
 	Constant* red = CreateConstantTexture(Vector3f(0.75, 0.25, 0.25));
 	Constant* blue = CreateConstantTexture(Vector3f(0.25, 0.25, 0.75));
 	Constant* white = CreateConstantTexture(Vector3f::one);
+	Constant* gray = CreateConstantTexture(Vector3f(0.578596, 0.578596, 0.578596));
+	Constant* roughness = CreateConstantTexture(Vector3f(0.1));
 	Mirror* mirror = CreateMirrorBsdf(white);
 	Dielectric* dielectric = CreateDielectricBsdf(white, 1, 1.5);
+	RoughConductor* al = CreateRoughConductorBsdf(white, roughness, roughness, Vector3f(1.657460, 0.880369, 0.521229), Vector3f(9.223869, 6.269523, 4.837001));
 	Lambertian* crete = CreateLambertianBsdf(concrete);
 	Lambertian* matte = CreateLambertianBsdf(general);
 	Lambertian* l = CreateLambertianBsdf(red);
@@ -60,11 +64,11 @@ int main(int argc, char** argv) {
 	Spot* spot = CreateSpotLight(Vector3f(2, 2, 2), Vector3f(-0.9, 1.7, 0), Vector3f(0, -1, 0), 20, 15);
 	Distant* distant = CreateDistantLight(Vector3f(2, 2, 2), Vector3f(1, -1, -1));
 
-	Sphere* s = CreateSphereShape(crete, Vector3f(-0.45, 0.4, -0.1), 0.25);
-	Sphere* s1 = CreateSphereShape(crete, Vector3f(0.45, 0.4, 0.4), 0.25);
+	Sphere* s = CreateSphereShape(al, Vector3f(-0.45, 0.4, -0.1), 0.4);
+	Sphere* s1 = CreateSphereShape(matte, Vector3f(0.45, 0.4, 0.4), 0.4);
 	Quad* floor = CreateQuadShape(matte, Vector3f(0, 0, 0), Vector3f::zero, Vector3f::one);
 	Quad* ceil = CreateQuadShape(matte, Vector3f(0, 2, 0), Vector3f(180, 0, 0), Vector3f::one);
-	Quad* back = CreateQuadShape(crete, Vector3f(0, 1, -1), Vector3f(90, 0, 0), Vector3f::one);
+	Quad* back = CreateQuadShape(matte, Vector3f(0, 1, -1), Vector3f(90, 0, 0), Vector3f::one);
 	Quad* left = CreateQuadShape(l, Vector3f(-1, 1, 0), Vector3f(0, 0, -90), Vector3f::one);
 	Quad* right = CreateQuadShape(r, Vector3f(1, 1, 0), Vector3f(0, 0, 90), Vector3f::one);
 //	Quad* light = CreateQuadShape(matte, Vector3f(-0.005, 1.98, -0.03), Vector3f(180, 0, 0), Vector3f(0.235, 1, 0.19));
