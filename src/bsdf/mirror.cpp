@@ -13,7 +13,7 @@ namespace pol {
 
 	void Mirror::SampleBsdf(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& out, Vector3f& fr, Float& pdf) const {
 		out = Vector3f(-in.x, in.y, -in.z);
-		fr = specular->Evaluate(isect) / isect.shFrame.CosTheta(out);
+		fr = specular->Evaluate(isect) / Frame::CosTheta(out);
 		pdf = 1;
 	}
 

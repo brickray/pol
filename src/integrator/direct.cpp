@@ -53,7 +53,7 @@ namespace pol {
 			if (!light->IsDelta())
 				weight = PowerHeuristic(1, lightPdf, 1, bsdfPdf);
 
-			L += weight * fr * radiance * fabs(isect.shFrame.CosTheta(localOut)) / (choicePdf * lightPdf);
+			L += weight * fr * radiance * fabs(Frame::CosTheta(localOut)) / (choicePdf * lightPdf);
 		
 			//sample bsdf
 			Vector3f out;

@@ -5,6 +5,7 @@
 #include "texture.h"
 #include "intersection.h"
 #include "warp.h"
+#include "frame.h"
 
 namespace pol {
 	class Bsdf : public PolObject {
@@ -72,7 +73,6 @@ namespace pol {
 	//thus, the ggx normal distribution function is normalized
 	//here is the code
 	__forceinline Float GGXD(const Vector3f& wh, Float alphaX, Float alphaY) {
-		Float cosTheta = wh.y;
 		/*if (alphaX == alphaY) {
 			//isotropic
 			Float alpha2 = alphaX * alphaX;
@@ -82,7 +82,7 @@ namespace pol {
 		}
 		else*/ {
 			//anisotropic
-			Float cosTheta2 = cosTheta * cosTheta;
+			Float cosTheta2 = Frame::CosTheta2(wh);
 			Float sinTheta2 = Clamp(1 - cosTheta2, Float(0), Float(1));
 			Float tanTheta2 = sinTheta2 / cosTheta2;
 			if (isinf(tanTheta2)) return 0;
@@ -109,8 +109,7 @@ namespace pol {
 	//and its anisotropic variant is given by
 	//        G1(w) = 2 / (1 + sqrt(1 + tan(wh)^2*(cos(wh)^2*(alphax*alphax) + sin(wh)^2*(alphay*alphay)))
 	__forceinline Float GGXG1(const Vector3f& w, const Vector3f& wh, Float alphaX, Float alphaY) {
-		Float wdn = w.y;
-		Float cosTheta2 = wdn * wdn;
+		Float cosTheta2 = Frame::CosTheta2(w);
 		Float sinTheta2 = Clamp(1 - cosTheta2, Float(0), Float(1));
 		Float tanTheta2 = sinTheta2 / cosTheta2;
 		if (isinf(tanTheta2)) return 0;

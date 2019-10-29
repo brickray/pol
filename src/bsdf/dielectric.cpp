@@ -13,21 +13,21 @@ namespace pol {
 
 	void Dielectric::SampleBsdf(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& out, Vector3f& fr, Float& pdf) const {
 		Float ei = etai, et = etat;
-		Float cosi = isect.shFrame.CosTheta(in);
+		Float cosi = Frame::CosTheta(in);
 		bool enter = cosi > 0;
 		if (!enter) swap(ei, et);
 
 		//snell's law
 		//sini*etai = sint*etat
 		Float eta = ei / et;
-		Float sint = isect.shFrame.SinTheta(in) * eta;
+		Float sint = Frame::SinTheta(in) * eta;
 		if (sint >= 1) {
 			//here is total internal reflection
 			//the energy of refraction is zero
 			//calculate reflection direction
 			Vector3f reflectDir = Vector3f(-in.x, in.y, -in.z);
 			out = reflectDir;
-			fr = specular->Evaluate(isect) / isect.shFrame.CosTheta(out);
+			fr = specular->Evaluate(isect) / Frame::CosTheta(out);
 			pdf = 1;
 			return;
 		}

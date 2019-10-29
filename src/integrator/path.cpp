@@ -71,7 +71,7 @@ namespace pol {
 					if (!light->IsDelta())
 						weight = PowerHeuristic(1, lightPdf, 1, bsdfPdf);
 
-					Ld += weight * fr * radiance * fabs(isect.shFrame.CosTheta(localOut)) / (choicePdf * lightPdf);
+					Ld += weight * fr * radiance * fabs(Frame::CosTheta(localOut)) / (choicePdf * lightPdf);
 				}
 
 				//sample bsdf
@@ -103,7 +103,7 @@ namespace pol {
 			bsdf->SampleBsdf(isect, localIn, sampler->Next2D(), out, fr, bsdfPdf);
 			if (bsdfPdf == 0) break;
 
-			Float costheta = isect.shFrame.CosTheta(out);
+			Float costheta = Frame::CosTheta(out);
 			//transform out direction from local coordinate to world coordinate
 			out = isect.shFrame.ToWorld(out);
 			beta *= fr * fabs(costheta) / bsdfPdf;
