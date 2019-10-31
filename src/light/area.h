@@ -14,8 +14,9 @@ namespace pol {
 		Area(const Vector3f& radiance, Shape* shape, bool twoside);
 
 		virtual bool IsDelta() const;
+		virtual bool IsInfinite() const;
 		virtual Float Luminance() const;
-		virtual void SampleLight(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const;
+		virtual void SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const;
 
 		virtual Vector3f Le(const Vector3f& in, const Vector3f& nor) const;
 

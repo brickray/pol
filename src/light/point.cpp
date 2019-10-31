@@ -10,6 +10,10 @@ namespace pol {
 		return true;
 	}
 
+	bool Point::IsInfinite() const {
+		return false;
+	}
+
 	Float Point::Luminance() const {
 		Vector3f power = Float(FOURPI) * radiance;
 
@@ -17,7 +21,7 @@ namespace pol {
 	}
 
 	//Lo = ¡Òfr*Li*cos(t)*dw
-	void Point::SampleLight(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const {
+	void Point::SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const {
 		Vector3f dir = position - isect.p;
 		Float lensq = dir.LengthSquare();
 		Float len = sqrtf(lensq);

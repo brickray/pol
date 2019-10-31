@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 	Spot* spot = CreateSpotLight(Vector3f(2, 2, 2), Vector3f(-0.9, 1.7, 0), Vector3f(0, -1, 0), 20, 15);
 	Distant* distant = CreateDistantLight(Vector3f(2, 2, 2), Vector3f(1, -1, -1));
 
-	Sphere* s = CreateSphereShape(al, Vector3f(-0.45, 0.4, -0.1), 0.4);
+	Sphere* s = CreateSphereShape(matte, Vector3f(-0.45, 0.4, -0.1), 0.4);
 	Sphere* s1 = CreateSphereShape(matte, Vector3f(0.45, 0.4, 0.4), 0.4);
 	Quad* floor = CreateQuadShape(matte, Vector3f(0, 0, 0), Vector3f::zero, Vector3f::one);
 	Quad* ceil = CreateQuadShape(matte, Vector3f(0, 2, 0), Vector3f(180, 0, 0), Vector3f::one);
@@ -94,9 +94,9 @@ int main(int argc, char** argv) {
 	scene.AddBsdf(r);
 	scene.AddBsdf(l);
 	scene.AddBsdf(f);
-	/*scene.AddLight(point);
+	//scene.AddLight(point);
 	scene.AddLight(spot);
-	scene.AddLight(distant);*/
+	//scene.AddLight(distant);
 	scene.AddLight(area);
 	scene.AddPrimitive(s);
 	scene.AddPrimitive(s1);
@@ -107,7 +107,7 @@ int main(int argc, char** argv) {
 	scene.AddPrimitive(right);
 	scene.AddPrimitive(light);
 
-	scene.Prepare("uniform");
+	scene.Prepare("spatial");
 
 	printf("%s\n", scene.ToString().c_str());
 

@@ -18,4 +18,6 @@ namespace pol {
 
 		int GetSampleCount() const;
 	};
+
+	Float RadicalInverse(unsigned int idx, unsigned int n);
 }

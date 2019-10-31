@@ -10,6 +10,10 @@ namespace pol {
 		return false;
 	}
 
+	bool Area::IsInfinite() const {
+		return false;
+	}
+
 	Float Area::Luminance() const {
 		Vector3f power = radiance * shape->SurfaceArea() * Float(PI);
 		if (twoside) power *= Float(2);
@@ -17,7 +21,7 @@ namespace pol {
 		return GetLuminance(power);
 	}
 
-	void Area::SampleLight(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const {
+	void Area::SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const {
 		Vector3f pos = isect.p, nor;
 		bool soldAngle;
 		shape->SampleShape(u, pos, nor, pdf, soldAngle);

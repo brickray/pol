@@ -33,14 +33,15 @@ namespace pol {
 
 		if (!isect.bsdf->IsDelta()) {
 			//sample light
-			int lightIdx = scene.LightLookup(sampler->Next1D());
-			Float choicePdf = scene.LightPdf(lightIdx);
+			const Distribution1D* lightDistribution = scene.LightLookup(p);
+			int lightIdx = lightDistribution->SampleDiscrete(sampler->Next1D());
+			Float choicePdf = lightDistribution->DiscretePdf(lightIdx);
 			Light* light = scene.GetLight(lightIdx);
 
 			Vector3f radiance;
 			Float lightPdf;
 			Ray shadowRay;
-			light->SampleLight(isect, in, sampler->Next2D(), radiance, lightPdf, shadowRay);
+			light->SampleLight(isect, sampler->Next2D(), radiance, lightPdf, shadowRay);
 			if (lightPdf == 0 || scene.Occluded(shadowRay)) return L;
 
 			Vector3f fr;

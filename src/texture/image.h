@@ -27,4 +27,5 @@ namespace pol {
 	};
 
 	Image* CreateImageTexture(int w, int h, const vector<Vector3f>& data, FilterMode fmode = FilterMode::E_TRILINEAR, WrapMode wmode = WrapMode::E_REPEAT);
+	Image* CreateImageTexture(const char* file, FilterMode fmode = FilterMode::E_TRILINEAR, WrapMode wmode = WrapMode::E_REPEAT);
 }

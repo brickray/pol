@@ -1,4 +1,5 @@
 #include "distant.h"
+#include "../core/scene.h"
 
 namespace pol {
 	Distant::Distant(const Vector3f& radiance, const Vector3f& direction)
@@ -6,15 +7,25 @@ namespace pol {
 
 	}
 
+	void Distant::Prepare(const Scene& scene) {
+		scene.GetBBox().BoundingSphere(center, radius);
+	}
+
 	bool Distant::IsDelta() const {
 		return true;
 	}
 
-	Float Distant::Luminance() const {
-		return 0;
+	bool Distant::IsInfinite() const {
+		return false;
 	}
 
-	void Distant::SampleLight(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const {
+	Float Distant::Luminance() const {
+		Vector3f power = Float(PI) * radius * radius * radiance;
+
+		return GetLuminance(power);
+	}
+
+	void Distant::SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const {
 		rad = radiance;
 		pdf = 1;
 		shadowRay = Ray(isect.p, -direction);

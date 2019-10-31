@@ -16,8 +16,9 @@ namespace pol {
 			Float total, Float falloff);
 
 		virtual bool IsDelta() const;
+		virtual bool IsInfinite() const;
 		virtual Float Luminance() const;
-		virtual void SampleLight(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const;
+		virtual void SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const;
 
 		virtual Float Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const;
 

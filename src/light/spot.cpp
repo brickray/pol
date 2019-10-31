@@ -13,13 +13,17 @@ namespace pol {
 		return true;
 	}
 
+	bool Spot::IsInfinite() const {
+		return false;
+	}
+
 	Float Spot::Luminance() const {
 		Vector3f power = radiance * Float(TWOPI * (1 - (total + falloff) * 0.5));
 
 		return GetLuminance(power);
 	}
 
-	void Spot::SampleLight(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const {
+	void Spot::SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const {
 		Vector3f dir = position - isect.p;
 		Float lensq = dir.LengthSquare();
 		Float len = sqrtf(lensq);

@@ -3,13 +3,9 @@
 #include "../core/light.h"
 
 namespace pol {
-	class Point : public Light {
-	private:
-		Vector3f radiance;
-		Vector3f position;
-
+	class Infinite : public Light {
 	public:
-		Point(const Vector3f& radiance, const Vector3f& position);
+		Infinite(int w, int h, const vector<Vector3f>& data);
 
 		virtual bool IsDelta() const;
 		virtual bool IsInfinite() const;
@@ -20,6 +16,4 @@ namespace pol {
 
 		virtual string ToString() const;
 	};
-
-	Point* CreatePointLight(const Vector3f& radiance, const Vector3f& position);
 }

@@ -65,6 +65,8 @@ namespace pol {
 		if (accelerator) {
 			bool success = accelerator->Build(primitives);
 			if (!success) return;
+
+			worldBBox = accelerator->GetRootBBox();
 			//if nodes count is one,
 			//brute force intersect maybe fast
 			if (accelerator->GetNodesCount() == 1) {
@@ -73,25 +75,24 @@ namespace pol {
 			}
 		}
 
+		//light prepare
+		for (Light* light : lights) {
+			light->Prepare(*this);
+		}
+
 		//construct light distribution.
-		if(lightStrategy == "uniform"){
-			vector<Float> luminance;
-			luminance.reserve(lights.size());
-			for (const Light* light : lights) {
-				luminance.push_back(1);
-			}
-			lightDistribution = Distribution1D(&luminance[0], luminance.size());
+		if(lightStrategy == "uniform" || lights.size() == 1){
+			lightDistribution = new UniformLightDistribution(*this);
 		}
 		else if (lightStrategy == "power") {
-			vector<Float> luminance;
-			luminance.reserve(lights.size());
-			for (const Light* light : lights) {
-				luminance.push_back(light->Luminance());
-			}
-			lightDistribution = Distribution1D(&luminance[0], luminance.size());
+			lightDistribution = new PowerLightDistribution(*this);
+		}
+		else if (lightStrategy == "spatial") {
+			lightDistribution = new SpatialLightDistribution(*this);
 		}
 		else {
-			//unknown
+			//unknown strategy, use spatial method
+			lightDistribution = new SpatialLightDistribution(*this);
 		}
 	}
 
