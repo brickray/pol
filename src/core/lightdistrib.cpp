@@ -83,7 +83,7 @@ namespace pol {
 			// is likely to contribute to illumination in the voxel.
 			const int nSamples = 128;
 			vector<Light*> lights = scene.GetLight();
-			vector<Float> distribution(lights.size());
+			vector<Float> distribution(lights.size(), Float(0));
 			for (int i = 0; i < nSamples; ++i) {
 				Vector3f p = voxelBBox.Lerp(Vector3f(RadicalInverse(0, i),
 					RadicalInverse(1, i), RadicalInverse(2, i)));
