@@ -19,6 +19,11 @@ namespace pol {
 		return false;
 	}
 
+	//power = ¡Ò¡ÒLe*cos(t)*dW*dA
+	//since Le is constant, and delta direction
+	//power = Le¡ÒdA
+	//      = Le*A
+	//      = Le*PI*radius*radius
 	Float Distant::Luminance() const {
 		Vector3f power = Float(PI) * radius * radius * radiance;
 

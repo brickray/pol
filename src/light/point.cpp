@@ -14,6 +14,10 @@ namespace pol {
 		return false;
 	}
 
+	//power = ¡Ò¡ÒLe*cos(t)*dW*dA
+	//since Le is constant, and delta position
+	//power = Le¡ÒdW
+	//      = 4*PI*Le
 	Float Point::Luminance() const {
 		Vector3f power = Float(FOURPI) * radiance;
 

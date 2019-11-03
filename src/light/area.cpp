@@ -14,6 +14,13 @@ namespace pol {
 		return false;
 	}
 
+	//power = ¡Ò¡ÒLe*cos(t)*dW*dA
+	//since Le is constant,
+	//power = Le¡Ò¡Òcos(t)*dW*dA
+	//      = Le¡Ò¡Ò¡Òcos(t)sin(t)dt*dp*dA
+	//      = Le*2*PI*A*¡Òcos(t)sin(t)dt
+	//      = Le*PI*A
+	//A is surface area of shape
 	Float Area::Luminance() const {
 		Vector3f power = radiance * shape->SurfaceArea() * Float(PI);
 		if (twoside) power *= Float(2);

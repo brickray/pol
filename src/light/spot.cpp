@@ -17,6 +17,10 @@ namespace pol {
 		return false;
 	}
 
+	//power = ¡Ò¡ÒLe*cos(t)*dW*dA
+	//since Le is constant, and delta position
+	//power = Le¡ÒdW from 0 to thetamax
+	//      = 2*PI*Le*(1-cos(tmax))
 	Float Spot::Luminance() const {
 		Vector3f power = radiance * Float(TWOPI * (1 - (total + falloff) * 0.5));
 

@@ -96,10 +96,10 @@ int main(int argc, char** argv) {
 	scene.AddBsdf(r);
 	scene.AddBsdf(l);
 	scene.AddBsdf(f);
-	//scene.AddLight(point);
+	scene.AddLight(point);
 	//scene.AddLight(spot);
 	//scene.AddLight(distant);
-	scene.AddLight(area);
+	//scene.AddLight(area);
 	//scene.AddLight(infinite);
 	scene.AddPrimitive(s);
 	scene.AddPrimitive(s1);
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
 	scene.AddPrimitive(back);
 	scene.AddPrimitive(left);
 	scene.AddPrimitive(right);
-	scene.AddPrimitive(light);
+	//scene.AddPrimitive(light);
 
 	scene.Prepare("spatial");
 

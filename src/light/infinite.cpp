@@ -44,8 +44,15 @@ namespace pol {
 		return true;
 	}
 
+	//power = ¡Ò¡ÒLe*cos(t)*dW*dA
+	//here the power computed is approximate
+	//assume Le is constant
+	//power = Le¡Ò¡Òcos(t)*dW*dA  where cos(t) are always 1
+	//      = Le*4*PI*¡ÒdA
+	//      = Le*4*PI*A
+	//      = Le*4*PI*PI*radius*radius
 	Float Infinite::Luminance() const {
-		Vector3f power = Float(PI) * radius * radius * image.Lookup(Vector2f(0.5, 0.5));
+		Vector3f power = Float(FOURPI) * Float(PI) * radius * radius * image.Lookup(Vector2f(0.5, 0.5));
 	
 		return GetLuminance(power);
 	}
