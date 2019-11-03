@@ -66,7 +66,7 @@ int main(int argc, char** argv) {
 	Distant* distant = CreateDistantLight(Vector3f(2, 2, 2), Vector3f(1, -1, -1));
 	Infinite* infinite = CreateInfiniteLight(RotateY(90), "../envmap.exr");
 
-	Sphere* s = CreateSphereShape(matte, Vector3f(-0.45, 0.4, -0.1), 0.4);
+	Sphere* s = CreateSphereShape(al, Vector3f(-0.45, 0.4, -0.1), 0.4);
 	Sphere* s1 = CreateSphereShape(matte, Vector3f(0.45, 0.4, 0.4), 0.4);
 	Quad* floor = CreateQuadShape(matte, Vector3f(0, 0, 0), Vector3f::zero, Vector3f::one);
 	Quad* ceil = CreateQuadShape(matte, Vector3f(0, 2, 0), Vector3f(180, 0, 0), Vector3f::one);
@@ -100,12 +100,12 @@ int main(int argc, char** argv) {
 	//scene.AddLight(spot);
 	//scene.AddLight(distant);
 	scene.AddLight(area);
-	scene.AddLight(infinite);
+	//scene.AddLight(infinite);
 	scene.AddPrimitive(s);
 	scene.AddPrimitive(s1);
 	scene.AddPrimitive(floor);
 	scene.AddPrimitive(ceil);
-//	scene.AddPrimitive(back);
+	scene.AddPrimitive(back);
 	scene.AddPrimitive(left);
 	scene.AddPrimitive(right);
 	scene.AddPrimitive(light);

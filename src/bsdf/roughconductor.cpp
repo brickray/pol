@@ -20,6 +20,7 @@ namespace pol {
 			wh = -wh;
 		out = Reflect(in, wh);
 		if (Frame::CosTheta(in) * Frame::CosTheta(out) < 0) {
+			//it may occur at grazing angle
 			pdf = 0;
 			return;
 		}

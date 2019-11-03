@@ -71,31 +71,34 @@ namespace pol {
 			Vector3f fr;
 			Float bsdfPdf;
 			bsdf->SampleBsdf(isect, localIn, sampler->Next2D(), out, fr, bsdfPdf);
-			if (!bsdfPdf) return L;
-			out = isect.shFrame.ToWorld(out);
-			Ray scatterRay(p, out);
-			Intersection scatterIsect;
-			if (scene.Intersect(scatterRay, scatterIsect)) {
-				Light* light = scatterIsect.light;
-				Vector3f radiance;
-				Float lightPdf = 0;
-				if (light) {
-					radiance = light->Le(-out, scatterIsect.n);
-					lightPdf = light->Pdf(scatterIsect.p, p);
-					lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
+			//if (!bsdfPdf) return L;
+			//the above sentence makes a bug, it should not return when bsdfPdf = 0
+			if (bsdfPdf) {
+				out = isect.shFrame.ToWorld(out);
+				Ray scatterRay(p, out);
+				Intersection scatterIsect;
+				if (scene.Intersect(scatterRay, scatterIsect)) {
+					Light* light = scatterIsect.light;
+					Vector3f radiance;
+					Float lightPdf = 0;
+					if (light) {
+						radiance = light->Le(-out, scatterIsect.n);
+						lightPdf = light->Pdf(scatterIsect.p, p);
+						lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
+					}
+					if (!IsBlack(radiance)) {
+						Float weight = PowerHeuristic(1, bsdfPdf, 1, lightPdf);
+						L += weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
+					}
 				}
-				if (!IsBlack(radiance)) {
+				else if (scene.GetInfiniteLight()) {
+					Light* light = scene.GetInfiniteLight();
+					Vector3f radiance = light->Le(-out, Vector3f::zero);
+					Float lightPdf = light->Pdf(p + out, p);
+					lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
 					Float weight = PowerHeuristic(1, bsdfPdf, 1, lightPdf);
 					L += weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
 				}
-			}
-			else if (scene.GetInfiniteLight()) {
-				Light* light = scene.GetInfiniteLight();
-				Vector3f radiance = light->Le(-out, Vector3f::zero);
-				Float lightPdf = light->Pdf(p + out, p);
-				lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
-				Float weight = PowerHeuristic(1, bsdfPdf, 1, lightPdf);
-				L += weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
 			}
 		}
 
