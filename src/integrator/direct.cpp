@@ -53,13 +53,17 @@ namespace pol {
 				Vector3f fr;
 				Float bsdfPdf;
 				Vector3f localOut = isect.shFrame.ToLocal(shadowRay.d);
+				//here infinite light can easily make bsdfPdf = 0
+				//because it choose point on whole sphere randomly
 				bsdf->Fr(isect, localIn, localOut, fr, bsdfPdf);
 
-				Float weight = 1;
-				if (!light->IsDelta())
-					weight = PowerHeuristic(1, lightPdf, 1, bsdfPdf);
+				if (bsdfPdf != 0) {
+					Float weight = 1;
+					if (!light->IsDelta())
+						weight = PowerHeuristic(1, lightPdf, 1, bsdfPdf);
 
-				L += weight * fr * radiance * Frame::AbsCosTheta(localOut) / lightPdf;
+					L += weight * fr * radiance * Frame::AbsCosTheta(localOut) / lightPdf;
+				}
 			}
 
 			//sample bsdf
