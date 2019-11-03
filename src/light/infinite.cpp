@@ -92,7 +92,9 @@ namespace pol {
 
 	string Infinite::ToString() const {
 		string ret;
-		ret += "Infinite[\n]";
+		ret += "Infinite[\n  world = " + indent(world.ToString())
+			+ ",\n  image = " + indent(image.ToString())
+			+ "\n]";
 
 		return ret;
 	}

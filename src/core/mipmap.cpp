@@ -185,10 +185,24 @@ namespace pol {
 	}
 
 	string Mipmap::ToString() const {
+		static map<WrapMode, string> wmstring = {
+			pair<WrapMode, string>(WrapMode::E_REPEAT, "repeat"),
+			pair<WrapMode, string>(WrapMode::E_CLAMP, "clamp"),
+			pair<WrapMode, string>(WrapMode::E_MIRROR, "mirror")
+		};
+
+		static map<FilterMode, string> fmstring = {
+			pair<FilterMode, string>(FilterMode::E_NEARST, "nearst"),
+			pair<FilterMode, string>(FilterMode::E_LINEAR, "linear"),
+			pair<FilterMode, string>(FilterMode::E_TRILINEAR, "trilinear")
+		};
+
 		string ret;
 		ret += "Mipmap[\n  width = " + to_string(pyramid[0].w)
 			+ ",\n  height = " + to_string(pyramid[0].h)
 			+ ",\n  pyramid count = " + to_string(PyramidCount())
+			+ ",\n  wrap mode = " + wmstring[wmode]
+			+ ",\n  filter mode = " + fmstring[fmode]
 			+ "\n]";
 
 		return ret;
