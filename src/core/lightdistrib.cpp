@@ -99,7 +99,12 @@ namespace pol {
 					Ray shadowRay;
 					light->SampleLight(isect, u, radiance, pdf, shadowRay);
 					if (pdf != 0) {
-						distribution[j] += GetLuminance(radiance) / pdf;
+						Float scale = 1;
+						//if the point is occulded, then reduce contribution
+						if (scene.Occluded(shadowRay)) {
+							scale = 0.1;
+						}
+						distribution[j] += GetLuminance(radiance) / pdf * scale;
 					}
 				}
 			}

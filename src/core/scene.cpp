@@ -6,6 +6,7 @@ namespace pol {
 		sampler = nullptr;
 		integrator = nullptr;
 		accelerator = nullptr;
+		infinite = nullptr;
 	}
 
 	Scene::~Scene() {
@@ -49,6 +50,13 @@ namespace pol {
 	}
 
 	void Scene::AddLight(Light* l) {
+		if (l->IsInfinite()) {
+			if(!infinite) infinite = l;
+			else {
+				//two infinite light? not allowed
+
+			}
+		}
 		lights.push_back(l);
 	}
 

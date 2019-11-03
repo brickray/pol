@@ -22,6 +22,7 @@ namespace pol {
 
 		vector<Shape*> primitives;
 		vector<Light*> lights;
+		Light* infinite;
 		vector<Bsdf*> bsdfs;
 		vector<Texture*> textures;
 
@@ -48,6 +49,8 @@ namespace pol {
 		__forceinline Accelerator* GetAccelerator() const { return accelerator; }
 		__forceinline Light* GetLight(int idx) const { POL_ASSERT(idx < lights.size());  return lights[idx]; }
 		__forceinline vector<Light*> GetLight() const { return lights; }
+		__forceinline Light* GetInfiniteLight() const { return infinite; }
+		__forceinline int GetLightIndex(const Light* l) const { for (int i = 0; i < lights.size(); ++i) if (lights[i] == l) return i; return -1; }
 		__forceinline Shape* GetShape(int idx) const { POL_ASSERT(idx < primitives.size()); return primitives[idx]; }
 		__forceinline Bsdf* GetBsdf(int idx) const { POL_ASSERT(idx < bsdfs.size()); return bsdfs[idx]; }
 		__forceinline Texture* GetTexture(int idx) const { POL_ASSERT(idx < textures.size()); return textures[idx]; }

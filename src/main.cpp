@@ -23,6 +23,7 @@
 #include "light/spot.h"
 #include "light/distant.h"
 #include "light/area.h"
+#include "light/infinite.h"
 #include "accelerator/bvh.h"
 #include "core/imageio.h"
 #include "core/memory.h"
@@ -40,8 +41,8 @@ int main(int argc, char** argv) {
 
 	Bvh* accelerator = CreateBvhAccelerator();
 	Sampler* sampler = CreateRandomSampler(64);
-	//Integrator* integrator = CreateAoIntegrator(0.5);
-	//Integrator* integrator = CreateDirectIntegrator();
+//	Integrator* integrator = CreateAoIntegrator(0.5);
+//	Integrator* integrator = CreateDirectIntegrator();
 	Integrator* integrator = CreatePathIntegrator();
 	Checkerboard* checker = CreateCheckerboardTexture(Vector3f(0.325000, 0.310000, 0.250000),
 		Vector3f(0.725000, 0.710000, 0.680000), 20, 20);
@@ -63,6 +64,7 @@ int main(int argc, char** argv) {
 	Point* point = CreatePointLight(Vector3f(2, 2, 2), Vector3f(0, 1.7, 0));
 	Spot* spot = CreateSpotLight(Vector3f(2, 2, 2), Vector3f(-0.9, 1.7, 0), Vector3f(0, -1, 0), 20, 15);
 	Distant* distant = CreateDistantLight(Vector3f(2, 2, 2), Vector3f(1, -1, -1));
+	Infinite* infinite = CreateInfiniteLight(RotateY(90), "../envmap.exr");
 
 	Sphere* s = CreateSphereShape(matte, Vector3f(-0.45, 0.4, -0.1), 0.4);
 	Sphere* s1 = CreateSphereShape(matte, Vector3f(0.45, 0.4, 0.4), 0.4);
@@ -95,14 +97,15 @@ int main(int argc, char** argv) {
 	scene.AddBsdf(l);
 	scene.AddBsdf(f);
 	//scene.AddLight(point);
-	scene.AddLight(spot);
+	//scene.AddLight(spot);
 	//scene.AddLight(distant);
 	scene.AddLight(area);
+	scene.AddLight(infinite);
 	scene.AddPrimitive(s);
 	scene.AddPrimitive(s1);
 	scene.AddPrimitive(floor);
 	scene.AddPrimitive(ceil);
-	scene.AddPrimitive(back);
+//	scene.AddPrimitive(back);
 	scene.AddPrimitive(left);
 	scene.AddPrimitive(right);
 	scene.AddPrimitive(light);

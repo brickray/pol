@@ -6,7 +6,7 @@
 #include <stb\stb_image_write.h>
 
 #define TINYEXR_IMPLEMENTATION
-//#include "tinyexr.h"
+#include <tinyexr\tinyexr.h>
 
 namespace pol {
 
@@ -99,85 +99,85 @@ namespace pol {
 	}
 
 	bool ImageIO::LoadExr(const char* filename, int& width, int& height, vector<Vector3f>& output) {
-		//const char* err = NULL; // or nullptr in C++11
+		const char* err = NULL; // or nullptr in C++11
 
-		//float* out;
-		//int ret = LoadEXR(&out, &width, &height, filename, &err);
+		float* out;
+		int ret = LoadEXR(&out, &width, &height, filename, &err);
 
-		//if (ret != TINYEXR_SUCCESS) {
-		//	if (err) {
-		//		fprintf(stderr, "ERR : %s\n", err);
-		//		FreeEXRErrorMessage(err); // release memory of error message.
-		//		return false;
-		//	}
-		//}
-		//else {
-		//	output.resize(width*height);
-		//	for (int i = 0; i < width*height; ++i){
-		//		output[i] = make_float3(out[4 * i + 0], out[4 * i + 1], out[4 * i + 2]);
-		//	}
-		//	free(out); // relase memory of image data
-		//}
+		if (ret != TINYEXR_SUCCESS) {
+			if (err) {
+				fprintf(stderr, "ERR : %s\n", err);
+				FreeEXRErrorMessage(err); // release memory of error message.
+				return false;
+			}
+		}
+		else {
+			output.resize(width*height);
+			for (int i = 0; i < width*height; ++i){
+				output[i] = Vector3f(out[4 * i + 0], out[4 * i + 1], out[4 * i + 2]);
+			}
+			free(out); // relase memory of image data
+		}
 
 		return true;
 	}
 
 	bool ImageIO::SaveExr(const char* filename, int width, int height, const vector<Vector3f>& input) {
-		//EXRHeader header;
-		//InitEXRHeader(&header);
+		EXRHeader header;
+		InitEXRHeader(&header);
 
-		//EXRImage image;
-		//InitEXRImage(&image);
+		EXRImage image;
+		InitEXRImage(&image);
 
-		//image.num_channels = 3;
+		image.num_channels = 3;
 
-		//std::vector<float> images[3];
-		//images[0].resize(width * height);
-		//images[1].resize(width * height);
-		//images[2].resize(width * height);
+		std::vector<float> images[3];
+		images[0].resize(width * height);
+		images[1].resize(width * height);
+		images[2].resize(width * height);
 
-		//// Split RGBRGBRGB... into R, G and B layer
-		//for (int i = 0; i < width * height; i++) {
-		//	images[0][i] = input[i].x;
-		//	images[1][i] = input[i].y;
-		//	images[2][i] = input[i].z;
-		//}
+		// Split RGBRGBRGB... into R, G and B layer
+		for (int i = 0; i < width * height; i++) {
+			images[0][i] = input[i].x;
+			images[1][i] = input[i].y;
+			images[2][i] = input[i].z;
+		}
 
-		//float* image_ptr[3];
-		//image_ptr[0] = &(images[2].at(0)); // B
-		//image_ptr[1] = &(images[1].at(0)); // G
-		//image_ptr[2] = &(images[0].at(0)); // R
+		float* image_ptr[3];
+		image_ptr[0] = &(images[2].at(0)); // B
+		image_ptr[1] = &(images[1].at(0)); // G
+		image_ptr[2] = &(images[0].at(0)); // R
 
-		//image.images = (unsigned char**)image_ptr;
-		//image.width = width;
-		//image.height = height;
+		image.images = (unsigned char**)image_ptr;
+		image.width = width;
+		image.height = height;
 
-		//header.num_channels = 3;
-		//header.channels = (EXRChannelInfo *)malloc(sizeof(EXRChannelInfo) * header.num_channels);
-		//// Must be (A)BGR order, since most of EXR viewers expect this channel order.
-		//strncpy(header.channels[0].name, "B", 255); header.channels[0].name[strlen("B")] = '\0';
-		//strncpy(header.channels[1].name, "G", 255); header.channels[1].name[strlen("G")] = '\0';
-		//strncpy(header.channels[2].name, "R", 255); header.channels[2].name[strlen("R")] = '\0';
+		header.num_channels = 3;
+		header.channels = (EXRChannelInfo *)malloc(sizeof(EXRChannelInfo) * header.num_channels);
+		// Must be (A)BGR order, since most of EXR viewers expect this channel order.
+		strncpy(header.channels[0].name, "B", 255); header.channels[0].name[strlen("B")] = '\0';
+		strncpy(header.channels[1].name, "G", 255); header.channels[1].name[strlen("G")] = '\0';
+		strncpy(header.channels[2].name, "R", 255); header.channels[2].name[strlen("R")] = '\0';
 
-		//header.pixel_types = (int *)malloc(sizeof(int) * header.num_channels);
-		//header.requested_pixel_types = (int *)malloc(sizeof(int) * header.num_channels);
-		//for (int i = 0; i < header.num_channels; i++) {
-		//	header.pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // pixel type of input image
-		//	header.requested_pixel_types[i] = TINYEXR_PIXELTYPE_HALF; // pixel type of output image to be stored in .EXR
-		//}
+		header.pixel_types = (int *)malloc(sizeof(int) * header.num_channels);
+		header.requested_pixel_types = (int *)malloc(sizeof(int) * header.num_channels);
+		for (int i = 0; i < header.num_channels; i++) {
+			header.pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // pixel type of input image
+			header.requested_pixel_types[i] = TINYEXR_PIXELTYPE_HALF; // pixel type of output image to be stored in .EXR
+		}
 
-		//const char* err = NULL; // or nullptr in C++11 or later.
-		//int ret = SaveEXRImageToFile(&image, &header, filename, &err);
-		//if (ret != TINYEXR_SUCCESS) {
-		//	fprintf(stderr, "Save EXR err: %s\n", err);
-		//	FreeEXRErrorMessage(err); // free's buffer for an error message 
-		//	return false;
-		//}
-		//printf("Saved exr file. [ %s ] \n", filename);
+		const char* err = NULL; // or nullptr in C++11 or later.
+		int ret = SaveEXRImageToFile(&image, &header, filename, &err);
+		if (ret != TINYEXR_SUCCESS) {
+			fprintf(stderr, "Save EXR err: %s\n", err);
+			FreeEXRErrorMessage(err); // free's buffer for an error message 
+			return false;
+		}
+		printf("Saved exr file. [ %s ] \n", filename);
 
-		//free(header.channels);
-		//free(header.pixel_types);
-		//free(header.requested_pixel_types);
+		free(header.channels);
+		free(header.pixel_types);
+		free(header.requested_pixel_types);
 
 		return true;
 	}

@@ -29,7 +29,7 @@ namespace pol {
 		Float D = GGXD(wh, ax, ay);
 		Float G = GGXG(in, out, wh, ax, ay);
 		fr = specular->Evaluate(isect) * F * D * G /
-			(4 * fabs(Frame::CosTheta(in)) * fabs(Frame::CosTheta(out)));
+			(4 * Frame::AbsCosTheta(in) * Frame::AbsCosTheta(out));
 		pdf = PdfWh(wh, ax, ay) / (4 * fabs(Dot(in, wh)));
 	}
 
@@ -47,7 +47,7 @@ namespace pol {
 		Float D = GGXD(wh, ax, ay);
 		Float G = GGXG(in, out, wh, ax, ay);
 		fr = specular->Evaluate(isect) * F * D * G /
-			(4 * fabs(Frame::CosTheta(in)) * fabs(Frame::CosTheta(out)));
+			(4 * Frame::AbsCosTheta(in) * Frame::AbsCosTheta(out));
 		pdf = PdfWh(wh, ax, ay) / (4 * fabs(Dot(in, wh)));
 	}
 

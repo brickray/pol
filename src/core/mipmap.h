@@ -54,6 +54,7 @@ namespace pol {
 		int PyramidCount() const;
 		vector<TexInfo> GetPyramid() const;
 		void Build(int w, int h, const vector<Vector3f>& data, FilterMode fmode = FilterMode::E_TRILINEAR, WrapMode wmode = WrapMode::E_REPEAT);
+		Vector3f Lookup(const Vector2f& uv, Float width = 0) const;
 		Vector3f Lookup(const Intersection& isect) const;
 
 		string ToString() const;

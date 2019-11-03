@@ -10,14 +10,7 @@ namespace pol {
 		Ray r = ray;
 
 		Intersection isect;
-		bool intersect = scene.Intersect(r, isect);
-		if (!intersect) {
-			//background
-			return L;
-		}
-
-		//prepare differentials 
-		isect.ComputeDifferentials(ray);
+		bool found = scene.Intersect(r, isect);
 
 		Vector3f in = -r.d;
 		Vector3f localIn = isect.shFrame.ToLocal(in);
@@ -26,10 +19,22 @@ namespace pol {
 		Vector2f uv = isect.uv;
 		Bsdf* bsdf = isect.bsdf;
 
-		if (isect.light) {
-			//intersect area light?
-			return isect.light->Le(in, isect.n);
+		if (found) {
+			if (isect.light) {
+				//intersect area light?
+				L += isect.light->Le(in, isect.n);
+				return L;
+			}
 		}
+		else {
+			//background
+			Light* light = scene.GetInfiniteLight();
+			if (light) L = light->Le(in, Vector3f::zero);
+			return L;
+		}
+
+		//prepare differentials 
+		isect.ComputeDifferentials(ray);
 
 		if (!isect.bsdf->IsDelta()) {
 			//sample light
@@ -42,22 +47,25 @@ namespace pol {
 			Float lightPdf;
 			Ray shadowRay;
 			light->SampleLight(isect, sampler->Next2D(), radiance, lightPdf, shadowRay);
-			if (lightPdf == 0 || scene.Occluded(shadowRay)) return L;
+			if (lightPdf != 0 && !scene.Occluded(shadowRay)) {
+				lightPdf *= choicePdf;
 
-			Vector3f fr;
-			Float bsdfPdf;
-			Vector3f localOut = isect.shFrame.ToLocal(shadowRay.d);
-			bsdf->Fr(isect, localIn, localOut, fr, bsdfPdf);
-			if (!bsdfPdf) return L;
+				Vector3f fr;
+				Float bsdfPdf;
+				Vector3f localOut = isect.shFrame.ToLocal(shadowRay.d);
+				bsdf->Fr(isect, localIn, localOut, fr, bsdfPdf);
 
-			Float weight = 1;
-			if (!light->IsDelta())
-				weight = PowerHeuristic(1, lightPdf, 1, bsdfPdf);
+				Float weight = 1;
+				if (!light->IsDelta())
+					weight = PowerHeuristic(1, lightPdf, 1, bsdfPdf);
 
-			L += weight * fr * radiance * fabs(Frame::CosTheta(localOut)) / (choicePdf * lightPdf);
-		
+				L += weight * fr * radiance * Frame::AbsCosTheta(localOut) / lightPdf;
+			}
+
 			//sample bsdf
 			Vector3f out;
+			Vector3f fr;
+			Float bsdfPdf;
 			bsdf->SampleBsdf(isect, localIn, sampler->Next2D(), out, fr, bsdfPdf);
 			if (!bsdfPdf) return L;
 			out = isect.shFrame.ToWorld(out);
@@ -65,12 +73,25 @@ namespace pol {
 			Intersection scatterIsect;
 			if (scene.Intersect(scatterRay, scatterIsect)) {
 				Light* light = scatterIsect.light;
+				Vector3f radiance;
+				Float lightPdf = 0;
 				if (light) {
-					Vector3f radiance = light->Le(-out, scatterIsect.n);
-					Float lightPdf = light->Pdf(scatterIsect.p, p);
+					radiance = light->Le(-out, scatterIsect.n);
+					lightPdf = light->Pdf(scatterIsect.p, p);
+					lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
+				}
+				if (!IsBlack(radiance)) {
 					Float weight = PowerHeuristic(1, bsdfPdf, 1, lightPdf);
 					L += weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
 				}
+			}
+			else if (scene.GetInfiniteLight()) {
+				Light* light = scene.GetInfiniteLight();
+				Vector3f radiance = light->Le(-out, Vector3f::zero);
+				Float lightPdf = light->Pdf(p + out, p);
+				lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
+				Float weight = PowerHeuristic(1, bsdfPdf, 1, lightPdf);
+				L += weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
 			}
 		}
 

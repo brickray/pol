@@ -99,8 +99,7 @@ namespace pol {
 		}
 	}
 
-	Vector3f Mipmap::Lookup(const Intersection& isect) const {
-		Vector2f uv = getTexCoordinate(isect.uv);
+	Vector3f Mipmap::Lookup(const Vector2f& uv, Float width) const {
 		Vector3f color;
 		switch (fmode) {
 		case FilterMode::E_NEARST: {
@@ -116,11 +115,9 @@ namespace pol {
 			break;
 		}
 		case FilterMode::E_TRILINEAR: {
-			Float width = Max(Max(abs(isect.dudx), abs(isect.dudy)), 
-				Max(abs(isect.dvdx), abs(isect.dvdy)));
 			//compute mipmap level for trilinear filtering
 			Float level = PyramidCount() - 1 + Log2(Max(width, Float(1e-8)));
-			
+
 			//perform trilinear interpolation at appropriate mipmap level
 			if (level < 0) {
 				color = triangle(0, uv);
@@ -141,6 +138,14 @@ namespace pol {
 		}
 
 		return color;
+	}
+
+	Vector3f Mipmap::Lookup(const Intersection& isect) const {
+		Vector2f uv = getTexCoordinate(isect.uv);
+		Float width = Max(Max(abs(isect.dudx), abs(isect.dudy)),
+			Max(abs(isect.dvdx), abs(isect.dvdy)));
+		
+		return Lookup(uv, width);
 	}
 
 	Vector2f Mipmap::getTexCoordinate(const Vector2f& uv) const {
@@ -169,12 +174,14 @@ namespace pol {
 		TexInfo ti = pyramid[level];
 		int x = (ti.w - 1) * uv.x;
 		int y = (ti.h - 1) * uv.y;
+		int nextX = Clamp(x + 1, 0, ti.w - 1);
+		int nextY = Clamp(y + 1, 0, ti.h - 1);
 		Float dx = (ti.w - 1) * uv.x - x;
 		Float dy = (ti.h - 1) * uv.y - y;
 		return (1 - dy) * (1 - dx) * ti.data[y * ti.w + x]
-		 	 + (1 - dy) * dx * ti.data[y * ti.w + x + 1]
-			 + dy * (1 - dx) * ti.data[(y + 1) * ti.w + x]
-			 + dy * dx * ti.data[(y + 1) * ti.w + x + 1];
+		 	 + (1 - dy) * dx * ti.data[y * ti.w + nextX]
+			 + dy * (1 - dx) * ti.data[nextY * ti.w + x]
+			 + dy * dx * ti.data[nextY * ti.w + nextX];
 	}
 
 	string Mipmap::ToString() const {

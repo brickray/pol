@@ -26,7 +26,7 @@ namespace pol {
 		}
 
 		fr = diffuse->Evaluate(isect) * Float(INVPI);
-		pdf = Frame::CosTheta(out) * INVPI;
+		pdf = Frame::AbsCosTheta(out) * INVPI;
 	}
 
 	string Lambertian::ToString() const {

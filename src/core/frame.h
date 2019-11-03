@@ -40,6 +40,12 @@ namespace pol {
 		}
 
 		//assume vector is in local coordinate
+		//return absolute cosine of the angle between vector and normal
+		static __forceinline Float AbsCosTheta(const Vector3f& d) {
+			return fabs(CosTheta(d));
+		}
+
+		//assume vector is in local coordinate
 		//return sine of the angle between vector and normal
 		static __forceinline Float SinTheta(const Vector3f& d) {
 			//the range of theta between 0 and pi
@@ -48,9 +54,21 @@ namespace pol {
 		}
 
 		//assume vector is in local coordinate
+		//return absolute sine of the angle between vector and normal
+		static __forceinline Float AbsSinTheta(const Vector3f& d) {
+			return fabs(SinTheta(d));
+		}
+
+		//assume vector is in local coordinate
 		//return tangent of the angle between vector and normal
 		static __forceinline Float TanTheta(const Vector3f& d) {
 			return SinTheta(d) / CosTheta(d);
+		}
+
+		//assume vector is in local coordinate
+		//return absolute tangent of the angle between vector and normal
+		static __forceinline Float AbsTanTheta(const Vector3f& d) {
+			return fabs(TanTheta(d));
 		}
 
 		//assume vector is in local coordinate
@@ -79,6 +97,12 @@ namespace pol {
 		}
 
 		//assume vector is in local coordinate
+		//return absolute cosine of the phi parameter in spherical coordinates
+		static __forceinline Float AbsCosPhi(const Vector3f& d) {
+			return fabs(CosPhi(d));
+		}
+
+		//assume vector is in local coordinate
 		//return sine of the phi parameter in spherical coordinates
 		static __forceinline Float SinPhi(const Vector3f& d) {
 			Vector3f t = Normalize(Vector3f(d.x, 0, d.z));
@@ -86,10 +110,22 @@ namespace pol {
 		}
 
 		//assume vector is in local coordinate
+		//return absolute sine of the phi parameter in spherical coordinates
+		static __forceinline Float AbsSinPhi(const Vector3f& d) {
+			return fabs(SinPhi(d));
+		}
+
+		//assume vector is in local coordinate
 		//return tangent of the phi parameter in spherical coordinates
 		static __forceinline Float TanPhi(const Vector3f& d) {
 			Vector3f t = Normalize(Vector3f(d.x, 0, d.z));
 			return t.z / t.x;
+		}
+
+		//assume vector is in local coordinate
+		//return absolute tangent of the phi parameter in spherical coordinates
+		static __forceinline Float AbsTanPhi(const Vector3f& d) {
+			return fabs(TanPhi(d));
 		}
 
 		//assume vector is in local coordinate

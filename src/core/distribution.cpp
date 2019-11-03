@@ -79,35 +79,36 @@ namespace pol {
 	}
 
 	Distribution2D::Distribution2D(const Float f[], int nu, int nv) {
-		conditional.resize(nu);
-		for (int i = 0; i < nu; ++i) {
-			conditional[i] = Distribution1D(&f[i * nv], nv);
+		conditional.resize(nv);
+		for (int i = 0; i < nv; ++i) {
+			conditional[i] = Distribution1D(&f[i * nu], nu);
 		}
 
 		vector<Float> marginalFunc;
-		marginalFunc.resize(nu);
-		for (int i = 0; i < nu; ++i) {
+		marginalFunc.resize(nv);
+		for (int i = 0; i < nv; ++i) {
 			marginalFunc[i] = conditional[i].FuncInt();
 		}
-		marginal = Distribution1D(&marginalFunc[0], nu);
+		marginal = Distribution1D(&marginalFunc[0], nv);
 	}
 
 	Vector2f Distribution2D::SampleContinuous(const Vector2f& u, Float& pdf) const {
 		Float pdf1, pdf2;
 		int v;
-		Float p1 = marginal.SampleContinuous(u.x, pdf1, v);
-		Float p2 = conditional[v].SampleContinuous(u.y, pdf2, v);
+		Float p2 = marginal.SampleContinuous(u.y, pdf2, v);
+		Float p1 = conditional[v].SampleContinuous(u.x, pdf1, v);
 
 		pdf = pdf1 * pdf2;
 		return Vector2f(p1, p2);
 	}
 
 	Float Distribution2D::Pdf(const Vector2f& uv) const {
-		int iu = Clamp(uv.x * marginal.Count(), Float(0), Float(marginal.Count() - 1));
-		int iv = Clamp(uv.y * conditional[0].Count(), Float(0), Float(conditional[0].Count() - 1));
+		Float count = conditional[0].Count();
+		int iu = Clamp(uv.x * count, Float(0), Float(count - 1));
+		int iv = Clamp(uv.y * marginal.Count(), Float(0), Float(marginal.Count() - 1));
 		
-		Float pdf1 = marginal.DiscretePdf(iu);
-		Float pdf2 = conditional[iu].DiscretePdf(iv);
-		return pdf1 * pdf2 * marginal.Count() * conditional[iu].Count();
+		Float pdf2 = marginal.DiscretePdf(iv) * marginal.Count();
+		Float pdf1 = conditional[iv].DiscretePdf(iu) * count;
+		return pdf1 * pdf2 ;
 	}
 }

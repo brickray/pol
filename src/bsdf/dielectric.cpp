@@ -27,7 +27,7 @@ namespace pol {
 			//calculate reflection direction
 			Vector3f reflectDir = Vector3f(-in.x, in.y, -in.z);
 			out = reflectDir;
-			fr = specular->Evaluate(isect) / Frame::CosTheta(out);
+			fr = specular->Evaluate(isect) / Frame::AbsCosTheta(out);
 			pdf = 1;
 			return;
 		}
