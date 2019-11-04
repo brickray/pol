@@ -30,8 +30,8 @@ namespace pol {
 
 	void Area::SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const {
 		Vector3f pos = isect.p, nor;
-		bool soldAngle;
-		shape->SampleShape(u, pos, nor, pdf, soldAngle);
+		bool solidAngle;
+		shape->SampleShape(u, pos, nor, pdf, solidAngle);
 		Vector3f dir = pos - isect.p;
 		//twoside?
 		if (!twoside && Dot(dir, nor) > 0) {
@@ -43,7 +43,7 @@ namespace pol {
 		Float len = sqrtf(lensq);
 		dir = Normalize(dir);
 		rad = radiance;
-		if(!soldAngle) pdf *= (lensq / fabs(Dot(dir, nor)));
+		if(!solidAngle) pdf *= (lensq / fabs(Dot(dir, nor)));
 		shadowRay = Ray(isect.p, dir, Epsilon, len - Epsilon);
 	}
 

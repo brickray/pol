@@ -2,7 +2,7 @@
 
 namespace pol {
 	Disk::Disk(const Transform& world, Bsdf* bsdf, Float radius)
-		:Shape(world, bsdf), radius(radius) {
+		:Shape(bsdf), world(world), radius(radius) {
 		//precompute normal
 		normal = world.TransformNormal(Vector3f::up);
 	}
@@ -87,13 +87,13 @@ namespace pol {
 		return true;
 	}
 
-	void Disk::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdf, bool& soldAngle) const {
+	void Disk::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdf, bool& solidAngle) const {
 		Vector2f p = Warp::ConcentricDisk(u);
 		pos = Vector3f(p.x * radius, 0, p.y * radius);
 		pos = world.TransformPoint(pos);
 		nor = normal;
 		pdf = 1 / SurfaceArea();
-		soldAngle = false;
+		solidAngle = false;
 	}
 
 	Float Disk::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {

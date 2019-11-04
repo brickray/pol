@@ -2,7 +2,7 @@
 
 namespace pol {
 	Quad::Quad(const Transform& world, Bsdf* bsdf)
-		:Shape(world, bsdf) {
+		:Shape(bsdf), world(world) {
 		//precompute normal
 		normal = Normalize(world.TransformNormal(Vector3f::up));
 	}
@@ -86,12 +86,12 @@ namespace pol {
 		return true;
 	}
 
-	void Quad::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdf, bool& soldAngle) const {
+	void Quad::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdf, bool& solidAngle) const {
 		pos = Vector3f(2 * u.x - 1, 0, 2 * u.y - 1);
 		pos = world.TransformPoint(pos);
 		nor = normal;
 		pdf = 1 / SurfaceArea();
-		soldAngle = false;
+		solidAngle = false;
 	}
 
 	Float Quad::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {

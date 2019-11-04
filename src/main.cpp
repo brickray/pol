@@ -7,6 +7,7 @@
 #include "shape/sphere.h"
 #include "shape/quad.h"
 #include "shape/disk.h"
+#include "shape/triangle.h"
 #include "camera/pinhole.h"
 #include "sampler/random.h"
 #include "integrator/ao.h"
@@ -28,22 +29,27 @@
 #include "core/imageio.h"
 #include "core/memory.h"
 #include "core/mipmap.h"
+#include "core/meshio.h"
 
 using namespace pol;
 int main(int argc, char** argv) {
 	int w, h;
 	vector<Vector3f> data;
 	ImageIO::LoadTexture("../lines.png", w, h, true, data);
+	vector<Vector3f> vertices, normals;
+	vector<Vector2f> uvs;
+	vector<int> indices;
+	MeshIO::LoadModelFromFile(vertices, normals, uvs, indices, "../teapot.obj");
 	Scene scene;
 	Film* film = CreateFilm("../result.png", Vector2i(512, 512));
 	Camera* camera = CreatePinholeCamera(Lookat(Vector3f(0, 1, 6.8), Vector3f(0, 1, 0), Vector3f(0, 1, 0)),
 		Perspective(19.5, 1, 0.1, 100), film);
 
 	Bvh* accelerator = CreateBvhAccelerator();
-	Sampler* sampler = CreateRandomSampler(64);
+	Sampler* sampler = CreateRandomSampler(16);
 //	Integrator* integrator = CreateAoIntegrator(0.5);
 //	Integrator* integrator = CreateDirectIntegrator();
-	Integrator* integrator = CreatePathIntegrator();
+	Integrator* integrator = CreatePathIntegrator(3);
 	Checkerboard* checker = CreateCheckerboardTexture(Vector3f(0.325000, 0.310000, 0.250000),
 		Vector3f(0.725000, 0.710000, 0.680000), 20, 20);
 	Image* concrete = CreateImageTexture(w, h, data, FilterMode::E_TRILINEAR);
@@ -79,6 +85,12 @@ int main(int argc, char** argv) {
 	Area* area = CreateAreaLight(Vector3f(12, 12, 12), light);
 	light->SetLight(area);
 
+	Transform trans = TRS(Vector3f(0, 0, 0), Vector3f::zero, Vector3f(0.2));
+	vector<Triangle*> triangles = CreateTriangleMesh(trans, vertices, normals, uvs, indices, matte);
+	for (int i = 0; i < triangles.size(); ++i) {
+		scene.AddPrimitive(triangles[i]);
+	}
+
 	scene.SetAccelerator(accelerator);
 	scene.SetCamera(camera);
 	scene.SetSampler(sampler);
@@ -96,13 +108,13 @@ int main(int argc, char** argv) {
 	scene.AddBsdf(r);
 	scene.AddBsdf(l);
 	scene.AddBsdf(f);
-	scene.AddLight(point);
+	//scene.AddLight(point);
 	//scene.AddLight(spot);
 	//scene.AddLight(distant);
-	//scene.AddLight(area);
+	scene.AddLight(area);
 	//scene.AddLight(infinite);
-	scene.AddPrimitive(s);
-	scene.AddPrimitive(s1);
+//	scene.AddPrimitive(s);
+//	scene.AddPrimitive(s1);
 	scene.AddPrimitive(floor);
 	scene.AddPrimitive(ceil);
 	scene.AddPrimitive(back);
@@ -110,7 +122,7 @@ int main(int argc, char** argv) {
 	scene.AddPrimitive(right);
 	//scene.AddPrimitive(light);
 
-	scene.Prepare("spatial");
+	scene.Prepare("uniform");
 
 	printf("%s\n", scene.ToString().c_str());
 

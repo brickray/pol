@@ -2,7 +2,7 @@
 
 namespace pol {
 	Sphere::Sphere(const Transform& world, Bsdf* bsdf, Float radius)
-		:Shape(world, bsdf), radius(radius) {
+		:Shape(bsdf), world(world), radius(radius) {
 
 	}
 
@@ -129,7 +129,7 @@ namespace pol {
 		return true;
 	}
 
-    void Sphere::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdf, bool& soldAngle) const {
+    void Sphere::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdf, bool& solidAngle) const {
 		Vector3f center;
 		world.ExtractTranslation(center);
 		//pos to center
@@ -147,7 +147,7 @@ namespace pol {
 		pos = isect.p;
 		nor = isect.n;
 		pdf = Warp::UniformConePdf(costhetaMax);
-		soldAngle = true;
+		solidAngle = true;
 	}
 
 	Float Sphere::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {
