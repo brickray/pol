@@ -71,13 +71,15 @@ namespace pol {
 	void Scene::Prepare(const string& lightStrategy) {
 		//build accelerator
 		if (accelerator) {
-			bool success = accelerator->Build(primitives);
-			if (!success) return;
+			if (primitives.size() > 20) {
+				bool success = accelerator->Build(primitives);
+				if (!success) return;
 
-			worldBBox = accelerator->GetRootBBox();
-			//if nodes count is one,
-			//brute force intersect maybe fast
-			if (accelerator->GetNodesCount() == 1) {
+				worldBBox = accelerator->GetRootBBox();
+			}
+			else {
+				//if primitive count is small,
+				//brute force intersect maybe fast
 				POL_SAFE_DELETE(accelerator);
 				accelerator = nullptr;
 			}
@@ -184,12 +186,14 @@ namespace pol {
 			ret += "    " + indent(light->ToString(), 4);
 			ret += "\n";
 		}
-		ret += "  ]\n";
+		ret += "  ],\n";
 		//primitives
 		ret += "  Primitives = [\n";
 		for (const Shape* shape : primitives) {
-			ret += "    " + indent(shape->ToString(), 4);
-			ret += "\n";
+			string info = shape->ToString();
+			if (info == "") continue;
+			ret += "    " + indent(info, 4);
+			ret += ",\n";
 		}
 		ret += "  ]\n";
 		ret += "]\n";

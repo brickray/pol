@@ -55,7 +55,7 @@ namespace pol {
 
 		int bestAxis = -1;
 		int bestBucket;
-		Float bestCost = 2;
+		Float bestCost = 1 + bbox.SurfaceArea() * primitives.size();
 		Vector3f diagonal = bbox.Diagonal();
 		for (int axis = 0; axis < 3; ++axis) {
 			Bucket bucket[bucketSize];
@@ -65,7 +65,7 @@ namespace pol {
 				BBox shapeBBox = shape->WorldBBox();
 				Float center = shapeBBox.Center()[axis];
 				int idx = (center - bbox.fmin[axis]) / len * bucketSize;
-				idx = idx == bucketSize ? idx - 1 : idx;
+				idx = Clamp(idx, 0, bucketSize - 1);
 				//add shape to corresponding bucket
 				bucket[idx].bbox.Union(shapeBBox);
 				bucket[idx].count++;
@@ -86,20 +86,13 @@ namespace pol {
 				}
 
 				//calc cost
-				Float cost = 1 + (left.SurfaceArea() + right.SurfaceArea()) / bbox.SurfaceArea();
+				Float cost = 1 + (left.SurfaceArea() * countLeft + right.SurfaceArea() * countRight) / bbox.SurfaceArea();
 				if (cost < bestCost) {
 					bestAxis = axis;
 					bestCost = cost;
 					bestBucket = i;
 				}
 			}
-		}
-
-		//can not find axis to split, then just create leaf
-		if (bestAxis == -1) {
-			linearNodes.push_back(createLeaf(primitives, bbox));
-			
-			return;
 		}
 
 		vector<Shape*> left;
@@ -110,8 +103,8 @@ namespace pol {
 		for (Shape* shape : primitives) {
 			BBox shapeBBox = shape->WorldBBox();
 			Float center = shapeBBox.Center()[bestAxis];
-			int idx = (center - bbox.fmin[bestAxis]) / len;
-			idx = idx == bucketSize ? idx - 1 : idx;
+			int idx = (center - bbox.fmin[bestAxis]) / len * bucketSize;
+			idx = Clamp(idx, 0, bucketSize - 1);
 
 			if (idx < bestBucket) {
 				left.push_back(shape);
@@ -123,13 +116,20 @@ namespace pol {
 			}
 		}
 
+		//can not find axis to split, then just create leaf
+		if (left.size() == primitives.size() || right.size() == primitives.size()) {
+			linearNodes.push_back(createLeaf(primitives, bbox));
+
+			return;
+		}
+
 		//create node
 		BvhNode* node = new BvhNode();
 		node->bbox = bbox;
 		linearNodes.push_back(node);
 		nextFree++;
 		split(left, leftBBox, nextFree);
-		node->right = nextFree++;
+		node->right = ++nextFree;
 		split(right, rightBBox, nextFree);
 	}
 
@@ -166,7 +166,6 @@ namespace pol {
 		int stackTop = 0;
 		int nodeIdx = 0;
 		stack[stackTop++] = 0;
-		bool intersect = false;
 
 		while (true) {
 			if (!stackTop) break;
