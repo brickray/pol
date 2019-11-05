@@ -28,7 +28,7 @@ namespace pol {
 		return ret;
 	}
 
-	vector<Triangle*> CreateTriangleMesh(const Transform& world, const vector<Vector3f>& p, const vector<Vector3f>& n,
+	vector<Triangle*> CreateTriangleMeshShape(const Transform& world, const vector<Vector3f>& p, const vector<Vector3f>& n,
 		const vector<Vector2f>& uv, const vector<int>& indices, Bsdf* bsdf, Texture* alphaMask) {
 		//auto release
 		shared_ptr<TriangleMesh> mesh = shared_ptr<TriangleMesh>(new TriangleMesh(world, p, n, uv, indices, bsdf, alphaMask));
@@ -110,23 +110,45 @@ namespace pol {
 
 		//calculate UV
 		Vector2f uv = uv1* (1.f - b1 - b2) + uv2 * b1 + uv3 * b2;
-
-		isect.p = ray(tt);
-		isect.n = Normalize(n1 * (1.f - b1 - b2) + n2 * b1 + n3 * b2);
-		isect.uv = uv;
-		isect.dpdu = 0;
-		isect.dpdv = 0;
-		isect.bsdf = bsdf;
-		isect.light = light;
+		Vector3f dpdu, dpdv;
+		//calculate partial differential
+		//p = pi + dpdu*ui + dpdv*vi
+		//| p2 - p1 |   | u2 - u1  v2 - v1 | | dpdu |
+		//|         | = |                  | |      |
+		//| p3 - p1 |   | u3 - u1  v3 - v1 | | dpdv |
+		Vector2f duv1 = uv2 - uv1;
+		Vector2f duv2 = uv3 - uv1;
+		Float det = duv1.x * duv2.y - duv1.y * duv2.x;
+		if (det == 0) {
+			//degenerate
+			CoordinateSystem(Cross(e1, e2), dpdu, dpdv);
+		}
+		else {
+			Float invDet = 1 / det;
+			dpdu = (duv2.y * e1 - duv2.x * e2) * invDet;
+			dpdv = (-duv1.y * e1 + duv1.x * e2) * invDet;
+		}
 
 		//alpha mask texture exists?
 		if (mesh->alphaMask) {
-			Float alpha = mesh->alphaMask->Evaluate(isect).x;
+			Intersection localIsect;
+			localIsect.uv = uv;
+			localIsect.dpdu = dpdu;
+			localIsect.dpdv = dpdv;
+			Float alpha = mesh->alphaMask->Evaluate(localIsect).x;
 			if (alpha < Epsilon) {
 				//if alpha < Epsilon, discard
 				return false;
 			}
 		}
+
+		isect.p = ray(tt);
+		isect.n = Normalize(n1 * (1.f - b1 - b2) + n2 * b1 + n3 * b2);
+		isect.uv = uv;
+		isect.dpdu = dpdu;
+		isect.dpdv = dpdv;
+		isect.bsdf = bsdf;
+		isect.light = light;
 
 		//finally, set tmax
 		ray.tmax = tt;
@@ -173,8 +195,43 @@ namespace pol {
 		if (tt < ray.tmin || tt > ray.tmax)
 			return false;
 
+		//calculate UV
+		Vector2f uv = uv1 * (1.f - b1 - b2) + uv2 * b1 + uv3 * b2;
+		Vector3f dpdu, dpdv;
+		//calculate partial differential
+		//p = pi + dpdu*ui + dpdv*vi
+		//| p2 - p1 |   | u2 - u1  v2 - v1 | | dpdu |
+		//|         | = |                  | |      |
+		//| p3 - p1 |   | u3 - u1  v3 - v1 | | dpdv |
+		Vector2f duv1 = uv2 - uv1;
+		Vector2f duv2 = uv3 - uv1;
+		Float det = duv1.x * duv2.y - duv1.y * duv2.x;
+		if (det == 0) {
+			//degenerate
+			CoordinateSystem(Cross(e1, e2), dpdu, dpdv);
+		}
+		else {
+			Float invDet = 1 / det;
+			dpdu = (duv2.y * e1 - duv2.x * e2) * invDet;
+			dpdv = (-duv1.y * e1 + duv1.x * e2) * invDet;
+		}
+
+		//alpha mask texture exists?
+		if (mesh->alphaMask) {
+			Intersection localIsect;
+			localIsect.uv = uv;
+			localIsect.dpdu = dpdu;
+			localIsect.dpdv = dpdv;
+			Float alpha = mesh->alphaMask->Evaluate(localIsect).x;
+			if (alpha < Epsilon) {
+				//if alpha < Epsilon, discard
+				return false;
+			}
+		}
+
 		return true;
 	}
+
 	void Triangle::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdf, bool& solidAngle) const {
 		int idx1 = mesh->indices[faceIndex + 0];
 		int idx2 = mesh->indices[faceIndex + 1];
@@ -204,8 +261,6 @@ namespace pol {
 			ret += mesh->ToString();
 			ret += ",\n  bsdf = " + indent(bsdf->ToString());
 			ret += "\n]";
-
-			return ret;
 		}
 
 		return ret;

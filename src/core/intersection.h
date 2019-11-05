@@ -30,7 +30,9 @@ namespace pol {
 
 	public:
 		Intersection()
-			:bsdf(nullptr), light(nullptr) {
+			:bsdf(nullptr), light(nullptr)
+			, dudx(0), dudy(0)
+			, dvdx(0), dvdy(0) {
 
 		}
 

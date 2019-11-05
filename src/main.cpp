@@ -8,6 +8,7 @@
 #include "shape/quad.h"
 #include "shape/disk.h"
 #include "shape/triangle.h"
+#include "shape/heightfield.h"
 #include "camera/pinhole.h"
 #include "sampler/random.h"
 #include "integrator/ao.h"
@@ -33,26 +34,30 @@
 
 using namespace pol;
 int main(int argc, char** argv) {
-	int w, h;
+	int w, h, w1, h1;
 	vector<Vector3f> data;
-	ImageIO::LoadTexture("../lines.png", w, h, true, data);
+	ImageIO::LoadTexture("../assets/terrain-texture.jpg", w, h, true, data);
+	vector<Vector3f> alpha;
+	ImageIO::LoadTexture("../assets/urticaleaf_alpha.png", w1, h1, false, alpha);
+
 	vector<Vector3f> vertices, normals;
 	vector<Vector2f> uvs;
 	vector<int> indices;
-	MeshIO::LoadModelFromFile(vertices, normals, uvs, indices, "../teapot.obj");
+	MeshIO::LoadModelFromFile(vertices, normals, uvs, indices, "../assets/Mesh025.obj");
 	Scene scene;
 	Film* film = CreateFilm("../result.png", Vector2i(512, 512));
-	Camera* camera = CreatePinholeCamera(Lookat(Vector3f(0, 1, 6.8), Vector3f(0, 1, 0), Vector3f(0, 1, 0)),
-		Perspective(19.5, 1, 0.1, 100), film);
+	Camera* camera = CreatePinholeCamera(Lookat(Vector3f(0, 1, 15), Vector3f(7.5, 2, 7.5), Vector3f(0, 1, 0)),
+		Perspective(60, 1, 0.1, 100), film);
 
 	Bvh* accelerator = CreateBvhAccelerator();
 	Sampler* sampler = CreateRandomSampler(16);
 //	Integrator* integrator = CreateAoIntegrator(0.5);
 //	Integrator* integrator = CreateDirectIntegrator();
-	Integrator* integrator = CreatePathIntegrator(3);
+	Integrator* integrator = CreatePathIntegrator();
 	Checkerboard* checker = CreateCheckerboardTexture(Vector3f(0.325000, 0.310000, 0.250000),
 		Vector3f(0.725000, 0.710000, 0.680000), 20, 20);
 	Image* concrete = CreateImageTexture(w, h, data, FilterMode::E_TRILINEAR);
+	Image* alphaTexture = CreateImageTexture(w1, h1, alpha);
 	Constant* general = CreateConstantTexture(Vector3f(0.75, 0.75, 0.75));
 	Constant* red = CreateConstantTexture(Vector3f(0.75, 0.25, 0.25));
 	Constant* blue = CreateConstantTexture(Vector3f(0.25, 0.25, 0.75));
@@ -69,8 +74,8 @@ int main(int argc, char** argv) {
 	Lambertian* f = CreateLambertianBsdf(checker);
 	Point* point = CreatePointLight(Vector3f(2, 2, 2), Vector3f(0, 1.7, 0));
 	Spot* spot = CreateSpotLight(Vector3f(2, 2, 2), Vector3f(-0.9, 1.7, 0), Vector3f(0, -1, 0), 20, 15);
-	Distant* distant = CreateDistantLight(Vector3f(2, 2, 2), Vector3f(1, -1, -1));
-	Infinite* infinite = CreateInfiniteLight(RotateY(90), "../envmap.exr");
+	Distant* distant = CreateDistantLight(Vector3f(4, 4, 4), Vector3f(1, -1, 1));
+	Infinite* infinite = CreateInfiniteLight(RotateY(90), "../assets/sky.exr");
 
 	Sphere* s = CreateSphereShape(al, Vector3f(-0.45, 0.4, -0.1), 0.4);
 	Sphere* s1 = CreateSphereShape(matte, Vector3f(0.45, 0.4, 0.4), 0.4);
@@ -85,8 +90,9 @@ int main(int argc, char** argv) {
 	Area* area = CreateAreaLight(Vector3f(12, 12, 12), light);
 	light->SetLight(area);
 
-	Transform trans = TRS(Vector3f(0, 0, 0), Vector3f::zero, Vector3f(0.2));
-	vector<Triangle*> triangles = CreateTriangleMesh(trans, vertices, normals, uvs, indices, matte);
+	Transform trans = TRS(Vector3f(0, 0, 0), Vector3f(0, 0, 0), Vector3f(15, 2, 15));
+	//vector<Triangle*> triangles = CreateTriangleMeshShape(trans, vertices, normals, uvs, indices, crete, alphaTexture);
+	vector<Triangle*> triangles = CreateHeightFieldShape(trans, "../assets/terrain-heightmap.png", crete);
 	for (int i = 0; i < triangles.size(); ++i) {
 		scene.AddPrimitive(triangles[i]);
 	}
@@ -110,16 +116,16 @@ int main(int argc, char** argv) {
 	scene.AddBsdf(f);
 	//scene.AddLight(point);
 	//scene.AddLight(spot);
-	//scene.AddLight(distant);
-	scene.AddLight(area);
-	//scene.AddLight(infinite);
+	scene.AddLight(distant);
+	//scene.AddLight(area);
+	scene.AddLight(infinite);
 //	scene.AddPrimitive(s);
 //	scene.AddPrimitive(s1);
-	scene.AddPrimitive(floor);
+	/*scene.AddPrimitive(floor);
 	scene.AddPrimitive(ceil);
 	scene.AddPrimitive(back);
 	scene.AddPrimitive(left);
-	scene.AddPrimitive(right);
+	scene.AddPrimitive(right);*/
 	//scene.AddPrimitive(light);
 
 	scene.Prepare("uniform");

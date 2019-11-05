@@ -172,6 +172,8 @@ namespace pol {
 		string null = "nullptr";
 
 		ret += "Scene[\n";
+		//bounds
+		ret += "  Scene Bounds = " + indent(worldBBox.ToString());
 		//accelerator
 		ret += "  Accelerator = " + (accelerator != nullptr ? indent(accelerator->ToString()) : null) + ",\n";
 		//camera

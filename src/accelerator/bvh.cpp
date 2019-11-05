@@ -95,6 +95,13 @@ namespace pol {
 			}
 		}
 
+		//can not find axis to split, then just create leaf
+		if (bestAxis == -1) {
+			linearNodes.push_back(createLeaf(primitives, bbox));
+
+			return;
+		}
+
 		vector<Shape*> left;
 		vector<Shape*> right;
 		BBox leftBBox;
@@ -116,16 +123,10 @@ namespace pol {
 			}
 		}
 
-		//can not find axis to split, then just create leaf
-		if (left.size() == primitives.size() || right.size() == primitives.size()) {
-			linearNodes.push_back(createLeaf(primitives, bbox));
-
-			return;
-		}
-
 		//create node
 		BvhNode* node = new BvhNode();
 		node->bbox = bbox;
+		node->axis = bestAxis;
 		linearNodes.push_back(node);
 		nextFree++;
 		split(left, leftBBox, nextFree);
@@ -139,21 +140,31 @@ namespace pol {
 		int nodeIdx = 0;
 		stack[stackTop++] = 0;
 		bool intersect = false;
+		
+		Vector3f invDir(1 / ray.d.x, 1 / ray.d.y, 1 / ray.d.z);
+		int dirIsNeg[3] = { invDir.x < 0, invDir.y < 0, invDir.z < 0 };
 
 		while (true) {
 			if (!stackTop) break;
 
 			nodeIdx = stack[--stackTop];
 			BvhNode* node = linearNodes[nodeIdx];
-			if (node->bbox.Intersect(ray)) {
+			if (node->bbox.Intersect(ray, invDir)) {
 				if (node->isleaf) {
 					for (const Shape* shape : node->primitives) {
 						intersect |= shape->Intersect(ray, isect);
 					}
 				}
 				else {
-					stack[stackTop++] = node->right;
-					stack[stackTop++] = nodeIdx + 1;
+					// put the far node to stack first
+					if (dirIsNeg[node->axis]) {
+						stack[stackTop++] = nodeIdx + 1;
+						stack[stackTop++] = node->right;
+					}
+					else {
+						stack[stackTop++] = node->right;
+						stack[stackTop++] = nodeIdx + 1;
+					}
 				}
 			}
 		}
@@ -166,21 +177,31 @@ namespace pol {
 		int stackTop = 0;
 		int nodeIdx = 0;
 		stack[stackTop++] = 0;
+		
+		Vector3f invDir(1 / ray.d.x, 1 / ray.d.y, 1 / ray.d.z);
+		int dirIsNeg[3] = { invDir.x < 0, invDir.y < 0, invDir.z < 0 };
 
 		while (true) {
 			if (!stackTop) break;
 
 			nodeIdx = stack[--stackTop];
 			BvhNode* node = linearNodes[nodeIdx];
-			if (node->bbox.Intersect(ray)) {
+			if (node->bbox.Intersect(ray, invDir)) {
 				if (node->isleaf) {
 					for (const Shape* shape : node->primitives) {
 						if (shape->Occluded(ray)) return true;
 					}
 				}
 				else {
-					stack[stackTop++] = node->right;
-					stack[stackTop++] = nodeIdx + 1;
+					// put the far node to stack first
+					if (dirIsNeg[node->axis]) {
+						stack[stackTop++] = nodeIdx + 1;
+						stack[stackTop++] = node->right;
+					}
+					else {
+						stack[stackTop++] = node->right;
+						stack[stackTop++] = nodeIdx + 1;
+					}
 				}
 			}
 		}

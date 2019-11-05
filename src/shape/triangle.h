@@ -36,6 +36,6 @@ namespace pol {
 		virtual string ToString() const;
 	};
 
-	vector<Triangle*> CreateTriangleMesh(const Transform& world, const vector<Vector3f>& p, const vector<Vector3f>& n,
+	vector<Triangle*> CreateTriangleMeshShape(const Transform& world, const vector<Vector3f>& p, const vector<Vector3f>& n,
 		const vector<Vector2f>& uv, const vector<int>& indices, Bsdf* bsdf, Texture* alphaMask = nullptr);
 }

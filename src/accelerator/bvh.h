@@ -11,6 +11,7 @@ namespace pol {
 		//	left node is current idx plus one;
 		//  left = curIdx + 1
 			int right;
+			int axis;
 			bool isleaf;
 
 			BvhNode()
