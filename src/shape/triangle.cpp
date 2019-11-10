@@ -9,8 +9,30 @@ namespace pol {
 			vertex = world.TransformPoint(vertex);
 		}
 
-		for (Vector3f& normal : this->n) {
-			normal = world.TransformNormal(normal);
+		if (n.size() == 0) {
+			//generate normal if no normal exists
+			this->n.resize(this->p.size());
+			for (int i = 0; i < indices.size(); i += 3) {
+				int idx1 = indices[i + 0];
+				int idx2 = indices[i + 1];
+				int idx3 = indices[i + 2];
+				Vector3f v1 = this->p[idx1];
+				Vector3f v2 = this->p[idx2];
+				Vector3f v3 = this->p[idx3];
+				Vector3f normal = Normalize(Cross(v2 - v1, v3 - v1));
+				this->n[idx1] += normal;
+				this->n[idx2] += normal;
+				this->n[idx3] += normal;
+			}
+
+			for (int i = 0; i < this->p.size(); ++i) {
+				this->n[i] = Normalize(this->n[i]);
+			}
+		}
+		else {
+			for (Vector3f& normal : this->n) {
+				normal = world.TransformNormal(normal);
+			}
 		}
 
 		hasTexcoord = uv.size() != 0;
