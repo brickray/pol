@@ -71,6 +71,7 @@ namespace pol {
 
 					if (bsdfPdf != 0) {
 						Float weight = 1;
+						//delta light has weight 1
 						if (!light->IsDelta())
 							weight = PowerHeuristic(lightPdf, bsdfPdf);
 
@@ -80,8 +81,7 @@ namespace pol {
 			}
 
 			//bsdf sampling
-			Vector3f out;
-			Vector3f fr;
+			Vector3f out, fr;
 			Float bsdfPdf;
 			bsdf->SampleBsdf(isect, localIn, sampler->Next2D(), out, fr, bsdfPdf);
 			if (bsdfPdf == 0) break;
@@ -91,8 +91,8 @@ namespace pol {
 			//transform out direction from local coordinate to world coordinate
 			out = isect.shFrame.ToWorld(out);
 
+			//trace a next ray
 			r = Ray(p, out);
-
 			//estimate direct light if needed
 			if (scene.Intersect(r, isect)) {
 				if (isect.light) {
@@ -104,7 +104,10 @@ namespace pol {
 					lightPdf = light->Pdf(isect.p, p);
 					lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
 					if (!IsBlack(radiance)) {
-						Float weight = PowerHeuristic(bsdfPdf, lightPdf);
+						Float weight = 1;
+						//delta bsdf has weight 1
+						if(!bsdf->IsDelta())
+						    weight = PowerHeuristic(bsdfPdf, lightPdf);
 						L += beta * weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
 					}
 
