@@ -15,7 +15,7 @@ namespace pol {
 				int idx = i * w + j;
 				Float x = Float(j) / (w - 1);
 				Float z = Float(i) / (h - 1);
-				p[idx] = Vector3f(x, height[idx].x, z);
+				p[idx] = Vector3f(x, height[idx].X(), z);
 				uv[idx] = Vector2f(x, z);
 			}
 		}

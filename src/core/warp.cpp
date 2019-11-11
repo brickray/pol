@@ -43,7 +43,7 @@ namespace pol {
 
 	//assume d is in local coordinante
 	Float Warp::CosineHemiSpherePdf(const Vector3f& d) {
-		return d.y * INVPI;
+		return d.Y() * INVPI;
 	}
 
 	//integrate pw from -theta to theta

@@ -38,7 +38,7 @@ namespace pol {
 	__forceinline Vector3f SchlickFresnel(const Vector3f& specular, Float costheta) {
 		Vector3f rs = specular;
 		Float c = 1 - costheta;
-		return rs + c * c * c * c * c * (Vector3f::one - rs);
+		return rs + c * c * c * c * c * (Vector3f::One() - rs);
 	}
 
 	//microfacet model
@@ -148,6 +148,6 @@ namespace pol {
 
 	//pdf 
 	__forceinline Float PdfWh(const Vector3f& wh, Float alphaX, Float alphaY) {
-		return GGXD(wh, alphaX, alphaY) * fabs(wh.y);
+		return GGXD(wh, alphaX, alphaY) * fabs(wh.Y());
 	}
 }

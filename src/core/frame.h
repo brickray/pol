@@ -30,13 +30,13 @@ namespace pol {
 
 		//convert from local coordinate to world coordinate
 		__forceinline Vector3f ToWorld(const Vector3f& d) const {
-			return u * d.x + v * d.y + w * d.z;
+			return u * d.X() + v * d.Y() + w * d.Z();
 		}
 
 		//assume vector is in local coordinate
 		//return cosine of the angle between vector and normal
 		static __forceinline Float CosTheta(const Vector3f& d) {
-			return d.y;
+			return d.Y();
 		}
 
 		//assume vector is in local coordinate
@@ -74,7 +74,7 @@ namespace pol {
 		//assume vector is in local coordinate
 		//return square of cosine of the angle between vector and normal
 		static __forceinline Float CosTheta2(const Vector3f& d) {
-			return d.y * d.y;
+			return d.Y() * d.Y();
 		}
 
 		//assume vector is in local coordinate
@@ -92,8 +92,8 @@ namespace pol {
 		//assume vector is in local coordinate
 		//return cosine of the phi parameter in spherical coordinates
 		static __forceinline Float CosPhi(const Vector3f& d) {
-			Vector3f t = Normalize(Vector3f(d.x, 0, d.z));
-			return t.x;
+			Vector3f t = Normalize(Vector3f(d.X(), 0, d.Z()));
+			return t.X();
 		}
 
 		//assume vector is in local coordinate
@@ -105,8 +105,8 @@ namespace pol {
 		//assume vector is in local coordinate
 		//return sine of the phi parameter in spherical coordinates
 		static __forceinline Float SinPhi(const Vector3f& d) {
-			Vector3f t = Normalize(Vector3f(d.x, 0, d.z));
-			return t.z;
+			Vector3f t = Normalize(Vector3f(d.X(), 0, d.Z()));
+			return t.Z();
 		}
 
 		//assume vector is in local coordinate
@@ -118,8 +118,8 @@ namespace pol {
 		//assume vector is in local coordinate
 		//return tangent of the phi parameter in spherical coordinates
 		static __forceinline Float TanPhi(const Vector3f& d) {
-			Vector3f t = Normalize(Vector3f(d.x, 0, d.z));
-			return t.z / t.x;
+			Vector3f t = Normalize(Vector3f(d.X(), 0, d.Z()));
+			return t.Z() / t.X();
 		}
 
 		//assume vector is in local coordinate
@@ -131,31 +131,31 @@ namespace pol {
 		//assume vector is in local coordinate
 		//return square of cosine of the phi parameter in spherical coordinates
 		static __forceinline Float CosPhi2(const Vector3f& d) {
-			Vector3f t = Normalize(Vector3f(d.x, 0, d.z));
-			return t.x * t.x;
+			Vector3f t = Normalize(Vector3f(d.X(), 0, d.Z()));
+			return t.X() * t.X();
 		}
 
 		//assume vector is in local coordinate
 		//return square of sine of the phi parameter in spherical coordinates
 		static __forceinline Float SinPhi2(const Vector3f& d) {
-			Vector3f t = Normalize(Vector3f(d.x, 0, d.z));
-			return t.z * t.z;
+			Vector3f t = Normalize(Vector3f(d.X(), 0, d.Z()));
+			return t.Z() * t.Z();
 		}
 
 		//assume vector is in local coordinate
 		//return square of tangent of the phi parameter in spherical coordinates
 		static __forceinline Float TanPhi2(const Vector3f& d) {
-			Vector3f t = Normalize(Vector3f(d.x, 0, d.z));
-			return t.z * t.z / (t.x * t.x);
+			Vector3f t = Normalize(Vector3f(d.X(), 0, d.Z()));
+			return t.Z() * t.Z() / (t.X() * t.X());
 		}
 
 		string ToString() const {
 			string ret;
-			ret = "Frame[\n"
+			/*ret = "Frame[\n"
 				   "  u = " + u.ToString() + ",\n"
 				   "  v = " + v.ToString() + ",\n"
 				   "  w = " + w.ToString() + "\n"
-				   "]";
+				   "]";*/
 
 			return ret;
 		}

@@ -25,7 +25,7 @@ namespace pol {
 			//here is total internal reflection
 			//the energy of refraction is zero
 			//calculate reflection direction
-			Vector3f reflectDir = Vector3f(-in.x, in.y, -in.z);
+			Vector3f reflectDir = Vector3f(-in.X(), in.Y(), -in.Z());
 			out = reflectDir;
 			fr = specular->Evaluate(isect) / Frame::AbsCosTheta(out);
 			pdf = 1;
@@ -38,7 +38,7 @@ namespace pol {
 		if (u.x < fresnel) {
 			//reflection part
 			//calculate reflection direction
-			Vector3f reflectDir = Vector3f(-in.x, in.y, -in.z);
+			Vector3f reflectDir = Vector3f(-in.X(), in.Y(), -in.Z());
 			out = reflectDir;
 			fr = fresnel * specular->Evaluate(isect) / abs(cosi);
 			pdf = fresnel;
@@ -47,7 +47,7 @@ namespace pol {
 			//refraction part
 			//calculate refraction direction
 			if (enter) cost = -cost;
-			Vector3f refractDir = Vector3f(-in.x * eta, cost, -in.z * eta);
+			Vector3f refractDir = Vector3f(-in.X() * eta, cost, -in.Z() * eta);
 		
 			out = refractDir;
 			fr = (1 - fresnel) * eta * eta * specular->Evaluate(isect) / abs(cost);

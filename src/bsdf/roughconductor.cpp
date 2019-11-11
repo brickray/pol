@@ -13,8 +13,8 @@ namespace pol {
 	}
 
 	void RoughConductor::SampleBsdf(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& out, Vector3f& fr, Float& pdf) const {
-		Float ax = alphaX->Evaluate(isect).x;
-		Float ay = alphaY->Evaluate(isect).x;
+		Float ax = alphaX->Evaluate(isect).X();
+		Float ay = alphaY->Evaluate(isect).X();
 		Vector3f wh = SampleWh(u, ax, ay);
 		if (Frame::CosTheta(in) < 0)
 			wh = -wh;
@@ -40,8 +40,8 @@ namespace pol {
 			return;
 		}
 
-		Float ax = alphaX->Evaluate(isect).x;
-		Float ay = alphaY->Evaluate(isect).x;
+		Float ax = alphaX->Evaluate(isect).X();
+		Float ay = alphaY->Evaluate(isect).X();
 		Vector3f wh = Normalize(in + out);
 		Float cosi = Dot(out, wh);
 		Vector3f F = ConductFresnel(fabs(cosi), eta, k);

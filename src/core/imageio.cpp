@@ -44,7 +44,7 @@ namespace pol {
 
 					//convert from srgb space to linear space
 					if (srgb)
-						output[idx] = Vector3f(powf(texel.x, 2.2f), powf(texel.y, 2.2f), powf(texel.z, 2.2f));
+						output[idx] = Vector3f(powf(texel.X(), 2.2f), powf(texel.Y(), 2.2f), powf(texel.Z(), 2.2f));
 					else
 						output[idx] = texel;
 				}
@@ -66,9 +66,9 @@ namespace pol {
 			for (int j = 0; j < width; ++j) {
 				unsigned pixel = i * width + j;
 				unsigned inverse = (height - i - 1) * width + j;
-				transform[3 * pixel] = unsigned(Clamp(input[inverse].x, 0.f, 1.f) * 255.f);
-				transform[3 * pixel + 1] = unsigned(Clamp(input[inverse].y, 0.f, 1.f) * 255.f);
-				transform[3 * pixel + 2] = unsigned(Clamp(input[inverse].z, 0.f, 1.f) * 255.f);
+				transform[3 * pixel] = unsigned(Clamp(input[inverse].X(), 0.f, 1.f) * 255.f);
+				transform[3 * pixel + 1] = unsigned(Clamp(input[inverse].Y(), 0.f, 1.f) * 255.f);
+				transform[3 * pixel + 2] = unsigned(Clamp(input[inverse].Z(), 0.f, 1.f) * 255.f);
 			}
 		}
 
@@ -85,9 +85,9 @@ namespace pol {
 			for (int j = 0; j < width; ++j) {
 				unsigned pixel = i * width + j;
 				unsigned inverse = (height - i - 1) * width + j;
-				transform[3 * pixel] = unsigned(Clamp(input[inverse].x, 0.f, 1.f) * 255.f);
-				transform[3 * pixel + 1] = unsigned(Clamp(input[inverse].y, 0.f, 1.f) * 255.f);
-				transform[3 * pixel + 2] = unsigned(Clamp(input[inverse].z, 0.f, 1.f) * 255.f);
+				transform[3 * pixel] = unsigned(Clamp(input[inverse].X(), 0.f, 1.f) * 255.f);
+				transform[3 * pixel + 1] = unsigned(Clamp(input[inverse].Y(), 0.f, 1.f) * 255.f);
+				transform[3 * pixel + 2] = unsigned(Clamp(input[inverse].Z(), 0.f, 1.f) * 255.f);
 			}
 		}
 
@@ -138,9 +138,9 @@ namespace pol {
 
 		// Split RGBRGBRGB... into R, G and B layer
 		for (int i = 0; i < width * height; i++) {
-			images[0][i] = input[i].x;
-			images[1][i] = input[i].y;
-			images[2][i] = input[i].z;
+			images[0][i] = input[i].X();
+			images[1][i] = input[i].Y();
+			images[2][i] = input[i].Z();
 		}
 
 		float* image_ptr[3];

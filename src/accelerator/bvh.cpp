@@ -141,8 +141,8 @@ namespace pol {
 		stack[stackTop++] = 0;
 		bool intersect = false;
 		
-		Vector3f invDir(1 / ray.d.x, 1 / ray.d.y, 1 / ray.d.z);
-		int dirIsNeg[3] = { invDir.x < 0, invDir.y < 0, invDir.z < 0 };
+		Vector3f invDir(1 / ray.d.X(), 1 / ray.d.Y(), 1 / ray.d.Z());
+		int dirIsNeg[3] = { invDir.X() < 0, invDir.Y() < 0, invDir.Z() < 0 };
 
 		while (true) {
 			if (!stackTop) break;
@@ -178,8 +178,8 @@ namespace pol {
 		int nodeIdx = 0;
 		stack[stackTop++] = 0;
 		
-		Vector3f invDir(1 / ray.d.x, 1 / ray.d.y, 1 / ray.d.z);
-		int dirIsNeg[3] = { invDir.x < 0, invDir.y < 0, invDir.z < 0 };
+		Vector3f invDir(1 / ray.d.X(), 1 / ray.d.Y(), 1 / ray.d.Z());
+		int dirIsNeg[3] = { invDir.X() < 0, invDir.Y() < 0, invDir.Z() < 0 };
 
 		while (true) {
 			if (!stackTop) break;

@@ -147,7 +147,7 @@ namespace pol {
 		for (int i = 0; i < film->res.x; ++i) {
 			for (int j = 0; j < film->res.y; ++j) {
 				sampler->Prepare(j * film->res.x + i);
-				Vector3f color(0);
+				Vector3f color(0.f);
 				for (int s = 0; s < sampleCount; ++s) {
 					Vector2f offset = sampler->Next2D() - Vector2f(0.5);
 					Vector2f sample = Vector2f(i, j) + offset;

@@ -4,7 +4,7 @@ namespace pol {
 	Disk::Disk(const Transform& world, Bsdf* bsdf, Float radius)
 		:Shape(bsdf), world(world), radius(radius) {
 		//precompute normal
-		normal = world.TransformNormal(Vector3f::up);
+		normal = world.TransformNormal(Vector3f::Up());
 	}
 
 	Float Disk::SurfaceArea() const {
@@ -22,7 +22,7 @@ namespace pol {
 		//first transform ray from world space to disk's local space
 		Ray r = world.TransformRayInverse(ray);
 		//compute t
-		Float t = -r.o.y / r.d.y;
+		Float t = -r.o.Y() / r.d.Y();
 		if (t < r.tmin || t > r.tmax) return false;
 
 		Vector3f pHit = r(t);
@@ -31,7 +31,7 @@ namespace pol {
 
 		//calc uv
 		Float u = sqrt(lensq) / radius;
-		Float v = atan2(pHit.z, pHit.x);
+		Float v = atan2(pHit.Z(), pHit.X());
 		if (v < 0) v += TWOPI;
 		v *= INV2PI;
 
@@ -78,7 +78,7 @@ namespace pol {
 		//first transform ray from world space to disk's local space
 		Ray r = world.TransformRayInverse(ray);
 		//compute t
-		Float t = -r.o.y / r.d.y;
+		Float t = -r.o.Y() / r.d.Y();
 		if (t < r.tmin || t > r.tmax) return false;
 
 		Vector3f pHit = r(t);
@@ -112,7 +112,7 @@ namespace pol {
 	}
 
 	Disk* CreateDiskShape(Bsdf* bsdf, const Vector3f& t, const Vector3f& r, Float radius) {
-		Transform toWorld = TRS(t, r, Vector3f::one);
+		Transform toWorld = TRS(t, r, Vector3f::One());
 		return new Disk(toWorld, bsdf, radius);
 	}
 }

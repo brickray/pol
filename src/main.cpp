@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 
 	Scene scene;
 	Film* film = CreateFilm("../result.png", Vector2i(512, 512));
-	Camera* camera = CreatePinholeCamera(Lookat(Vector3f(0, 6.8, 0), Vector3f(0, 0, 0), Vector3f(1, 0, 0)),
+	Camera* camera = CreatePinholeCamera(Lookat(Vector3f(0, 1, 6.8), Vector3f(0, 1, 0), Vector3f(0, 1, 0)),
 		Perspective(19.5, 1, 0.1, 100), film);
 
 	Bvh* accelerator = CreateBvhAccelerator();
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
 	Constant* general = CreateConstantTexture(Vector3f(0.75, 0.75, 0.75));
 	Constant* red = CreateConstantTexture(Vector3f(0.75, 0.25, 0.25));
 	Constant* blue = CreateConstantTexture(Vector3f(0.25, 0.25, 0.75));
-	Constant* white = CreateConstantTexture(Vector3f::one);
+	Constant* white = CreateConstantTexture(Vector3f::One());
 	Constant* gray = CreateConstantTexture(Vector3f(0.578596, 0.578596, 0.578596));
 	Constant* roughness = CreateConstantTexture(Vector3f(0.1));
 	Mirror* mirror = CreateMirrorBsdf(white);
@@ -82,11 +82,11 @@ int main(int argc, char** argv) {
 
 	Sphere* s = CreateSphereShape(al, Vector3f(-0.45, 0.4, -0.1), 0.4);
 	Sphere* s1 = CreateSphereShape(matte, Vector3f(0.45, 0.4, 0.4), 0.4);
-	Quad* floor = CreateQuadShape(matte, Vector3f(0, 0, 0), Vector3f::zero, Vector3f::one);
-	Quad* ceil = CreateQuadShape(matte, Vector3f(0, 2, 0), Vector3f(180, 0, 0), Vector3f::one);
-	Quad* back = CreateQuadShape(matte, Vector3f(0, 1, -1), Vector3f(90, 0, 0), Vector3f::one);
-	Quad* left = CreateQuadShape(l, Vector3f(-1, 1, 0), Vector3f(0, 0, -90), Vector3f::one);
-	Quad* right = CreateQuadShape(r, Vector3f(1, 1, 0), Vector3f(0, 0, 90), Vector3f::one);
+	Quad* floor = CreateQuadShape(matte, Vector3f(0, 0, 0), Vector3f::Zero(), Vector3f::One());
+	Quad* ceil = CreateQuadShape(matte, Vector3f(0, 2, 0), Vector3f(180, 0, 0), Vector3f::One());
+	Quad* back = CreateQuadShape(matte, Vector3f(0, 1, -1), Vector3f(90, 0, 0), Vector3f::One());
+	Quad* left = CreateQuadShape(l, Vector3f(-1, 1, 0), Vector3f(0, 0, -90), Vector3f::One());
+	Quad* right = CreateQuadShape(r, Vector3f(1, 1, 0), Vector3f(0, 0, 90), Vector3f::One());
 //	Quad* light = CreateQuadShape(matte, Vector3f(-0.005, 1.98, -0.03), Vector3f(180, 0, 0), Vector3f(0.235, 1, 0.19));
 //	Disk* light = CreateDiskShape(matte, Vector3f(0, 1.98, 0), Vector3f(180, 0, 0), 0.3);
 	Sphere* light = CreateSphereShape(matte, Vector3f(0, 1.5, 0), 0.2);
@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
 	light->SetLight(area);
 
 	Transform trans = TRS(Vector3f(0, 0.25, 0), Vector3f(0, 30, 0), Vector3f(0.5));
-	//vector<Triangle*> triangles = CreateTriangleMeshShape(trans, vertices, vector<Vector3f>(), uvs, indices, matte);
+	//vector<Triangle*> triangles = CreateTriangleMeshShape(trans, vertices, normals, uvs, indices, matte);
 	//vector<Triangle*> triangles = CreateHeightFieldShape(trans, "../assets/terrain-heightmap.png", crete);
 	vector<Triangle*> triangles = CreateSubDivisionShape(4, trans, vertices, normals, uvs, indices, matte);
 	for (int i = 0; i < triangles.size(); ++i) {
@@ -126,10 +126,10 @@ int main(int argc, char** argv) {
 //	scene.AddPrimitive(s);
 //	scene.AddPrimitive(s1);
 	scene.AddPrimitive(floor);
-//	scene.AddPrimitive(ceil);
-//	scene.AddPrimitive(back);
-//	scene.AddPrimitive(left);
-//	scene.AddPrimitive(right);
+	scene.AddPrimitive(ceil);
+	scene.AddPrimitive(back);
+	scene.AddPrimitive(left);
+	scene.AddPrimitive(right);
 	//scene.AddPrimitive(light);
 
 	scene.Prepare("uniform");

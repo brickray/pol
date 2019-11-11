@@ -12,7 +12,7 @@ namespace pol {
 	//    Li = Le + ¡ÒFr*Li*cos(t)*dw
 	//Le is direct illumination from light
 	Vector3f Path::Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const {
-		Vector3f L(0);
+		Vector3f L(0.f);
 		Vector3f beta(1);
 		Ray r = ray;
 		Intersection isect;
@@ -39,7 +39,7 @@ namespace pol {
 				else {
 					//background
 					Light* light = scene.GetInfiniteLight();
-					if(light) L += beta * light->Le(in, Vector3f::zero);
+					if(light) L += beta * light->Le(in, Vector3f::Zero());
 					break;
 				}
 			}
@@ -60,7 +60,7 @@ namespace pol {
 
 			//count direct lighting
 			if (!bsdf->IsDelta()) {
-				Vector3f Ld(0);
+				Vector3f Ld(0.f);
 				//sample light
 				const Distribution1D* lightDistribution = scene.LightLookup(p);
 				int lightIdx = lightDistribution->SampleDiscrete(sampler->Next1D());
@@ -118,7 +118,7 @@ namespace pol {
 					}
 					else if (scene.GetInfiniteLight()) {
 						Light* light = scene.GetInfiniteLight();
-						Vector3f radiance = light->Le(-out, Vector3f::zero);
+						Vector3f radiance = light->Le(-out, Vector3f::Zero());
 						Float lightPdf = light->Pdf(p + out, p);
 						lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
 						Float weight = PowerHeuristic(1, bsdfPdf, 1, lightPdf);

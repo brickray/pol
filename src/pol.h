@@ -1,5 +1,5 @@
 #pragma once
-
+#define BRICK_USING_SSE
 #include <transform.h>
 #include <string>
 #include <vector>
@@ -40,7 +40,7 @@ __forceinline bool SameHemiSphere(const Vector3f& in, const Vector3f& out) {
 }
 
 __forceinline bool IsBlack(const Vector3f& c) {
-	return c.x == 0 && c.y == 0 && c.z == 0;
+	return c.X() == 0 && c.Y() == 0 && c.Z() == 0;
 }
 
 __forceinline Vector3f Reflect(const Vector3f& in, const Vector3f& nor) {

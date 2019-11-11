@@ -28,12 +28,12 @@ namespace pol {
 
 		string ToString() const {
 			string ret;
-			ret += "RayDifferential[\n  " + indent(Ray::ToString())
+			/*ret += "RayDifferential[\n  " + indent(Ray::ToString())
 				+ ",\n  xo = " + rxOrigin.ToString()
 				+ ",\n  xd = " + rxDirection.ToString()
 				+ ",\n  yo = " + ryOrigin.ToString()
 				+ ",\n  yd = " + ryDirection.ToString()
-				+ "\n]";
+				+ "\n]";*/
 
 			return ret;
 		}

@@ -12,7 +12,7 @@ namespace pol {
 	//where V(p) is visibility function.
 	//V(p) = 1 if visible and 0 otherwise
 	Vector3f Ao::Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const {
-		Vector3f L(0);
+		Vector3f L(0.f);
 
 		Ray r = ray;
 		Intersection isect;

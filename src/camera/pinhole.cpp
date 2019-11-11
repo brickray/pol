@@ -28,7 +28,7 @@ namespace pol {
 		//transform ndc coord to view coord 
 		Vector3f vc = projection.TransformPointInverse(ndc);
 		//create ray with origin (0,0,0) and direction (vc)
-		Ray ray(Vector3f(0), Normalize(vc));
+		Ray ray(Vector3f(0.f), Normalize(vc));
 		//transform ray from view to world
 		ray = view.TransformRayInverse(ray);
 
@@ -47,8 +47,8 @@ namespace pol {
 		Vector3f rxDirection = vc + dxCamera;
 		Vector3f ryDirection = vc + dyCamera;
 		//create ray with origin (0,0,0) and direction (vc)
-		RayDifferential ray(Vector3f(0), Normalize(vc));
-		ray.rxOrigin = ray.ryOrigin = Vector3f(0);
+		RayDifferential ray(Vector3f(0.f), Normalize(vc));
+		ray.rxOrigin = ray.ryOrigin = Vector3f(0.f);
 		ray.rxDirection = Normalize(rxDirection);
 		ray.ryDirection = Normalize(ryDirection);
 		//transform ray differential from view to world

@@ -38,9 +38,7 @@ namespace pol {
 
 	Vector3f Film::filmic(const Vector3f& in) const {
 		Vector3f c = in - Vector3f(0.04);
-		c.x = Max(c.x, Float(0));
-		c.y = Max(c.y, Float(0));
-		c.z = Max(c.z, Float(0));
+		c = Max(c, Vector3f(0.f));
 		c = (c * (Float(6.2) * c + Float(0.5))) / (c * (Float(6.2) * c + Float(1.7)) + Float(0.06));
 	
 		return c;
@@ -53,7 +51,7 @@ namespace pol {
 			return 1.055 * pow(value, 1.0 / 2.4) - 0.055;
 		};
 
-		return Vector3f(toSRGB(c.x), toSRGB(c.y), toSRGB(c.z));
+		return Vector3f(toSRGB(c.X()), toSRGB(c.Y()), toSRGB(c.Z()));
 	}
 
 	Film* CreateFilm(const string& filename, const Vector2i& res, string tonemap) {

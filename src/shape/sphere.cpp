@@ -53,8 +53,8 @@ namespace pol {
 
 		//calc uv
 		Vector3f pHit = Normalize(r(t));
-		Float u = acos(pHit.y) * INVPI;
-		Float v = atan2(pHit.z, pHit.x);
+		Float u = acos(pHit.Y()) * INVPI;
+		Float v = atan2(pHit.Z(), pHit.X());
 		if (v < 0) v += TWOPI;
 		v *= INV2PI;
 

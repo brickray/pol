@@ -159,7 +159,7 @@ namespace pol {
 		objwriter::ObjWriter w(file);
 		for (int v = 0; v < p.size(); ++v) {
 			Vector3f vert = p[v];
-			w.vertex(vert.x, vert.y, vert.z);
+			w.vertex(vert.X(), vert.Y(), vert.Z());
 		}
 
 		for (int i = 0; i < indices.size(); i += 3) {
@@ -236,12 +236,12 @@ namespace pol {
 		for (int i = 0; i < aimesh->mNumVertices; ++i) {
 			Vector3f vertex, normal;
 			Vector2f texcoord;
-			vertex.x = aimesh->mVertices[i].x;
-			vertex.y = aimesh->mVertices[i].y;
-			vertex.z = aimesh->mVertices[i].z;
-			normal.x = aimesh->mNormals[i].x;
-			normal.y = aimesh->mNormals[i].y;
-			normal.z = aimesh->mNormals[i].z;
+			vertex[0] = aimesh->mVertices[i].x;
+			vertex[1] = aimesh->mVertices[i].y;
+			vertex[2] = aimesh->mVertices[i].z;
+			normal[0] = aimesh->mNormals[i].x;
+			normal[1] = aimesh->mNormals[i].y;
+			normal[2] = aimesh->mNormals[i].z;
 			if (aimesh->mTextureCoords[0]) {// have tex coordinate
 				texcoord.x = aimesh->mTextureCoords[0][i].x;
 				texcoord.y = aimesh->mTextureCoords[0][i].y;

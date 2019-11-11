@@ -157,7 +157,7 @@ namespace pol {
 			localIsect.uv = uv;
 			localIsect.dpdu = dpdu;
 			localIsect.dpdv = dpdv;
-			Float alpha = mesh->alphaMask->Evaluate(localIsect).x;
+			Float alpha = mesh->alphaMask->Evaluate(localIsect).X();
 			if (alpha < Epsilon) {
 				//if alpha < Epsilon, discard
 				return false;
@@ -244,7 +244,7 @@ namespace pol {
 			localIsect.uv = uv;
 			localIsect.dpdu = dpdu;
 			localIsect.dpdv = dpdv;
-			Float alpha = mesh->alphaMask->Evaluate(localIsect).x;
+			Float alpha = mesh->alphaMask->Evaluate(localIsect).X();
 			if (alpha < Epsilon) {
 				//if alpha < Epsilon, discard
 				return false;

@@ -4,13 +4,13 @@ namespace pol {
 	Quad::Quad(const Transform& world, Bsdf* bsdf)
 		:Shape(bsdf), world(world) {
 		//precompute normal
-		normal = Normalize(world.TransformNormal(Vector3f::up));
+		normal = Normalize(world.TransformNormal(Vector3f::Up()));
 	}
 
 	Float Quad::SurfaceArea() const {
 		Vector3f scale;
 		world.ExtractScale(scale);
-		return 4 * abs(scale.x) * abs(scale.z);
+		return 4 * abs(scale.X()) * abs(scale.Z());
 	}
 
 	BBox Quad::WorldBBox() const {
@@ -25,17 +25,17 @@ namespace pol {
 		Ray r = world.TransformRayInverse(ray);
 
 		//compute t
-		if (r.d.y == 0) return false;
-		Float t = -r.o.y / r.d.y;
+		if (r.d.Y() == 0) return false;
+		Float t = -r.o.Y() / r.d.Y();
 		if (t < r.tmin || t > r.tmax) return false;
 
 		Vector3f pHit = r(t);
-		if (pHit.x < -1 || pHit.x > 1) return false;
-		if (pHit.z < -1 || pHit.z > 1) return false;
+		if (pHit.X() < -1 || pHit.X() > 1) return false;
+		if (pHit.Z() < -1 || pHit.Z() > 1) return false;
 
 		//calc uv
-		Float u = (pHit.x + 1) / 2;
-		Float v = (pHit.z + 1) / 2;
+		Float u = (pHit.X() + 1) / 2;
+		Float v = (pHit.Z() + 1) / 2;
 
 		//x = 2*u - 1
 		//y = 0
@@ -75,13 +75,13 @@ namespace pol {
 		Ray r = world.TransformRayInverse(ray);
 
 		//compute t
-		if (r.d.y == 0) return false;
-		Float t = -r.o.y / r.d.y;
+		if (r.d.Y() == 0) return false;
+		Float t = -r.o.Y() / r.d.Y();
 		if (t < r.tmin || t > r.tmax) return false;
 
 		Vector3f pHit = r(t);
-		if (pHit.x < -1 || pHit.x > 1) return false;
-		if (pHit.z < -1 || pHit.z > 1) return false;
+		if (pHit.X() < -1 || pHit.X() > 1) return false;
+		if (pHit.Z() < -1 || pHit.Z() > 1) return false;
 
 		return true;
 	}

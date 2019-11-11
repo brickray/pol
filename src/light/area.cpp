@@ -53,7 +53,7 @@ namespace pol {
 
 	Vector3f Area::Le(const Vector3f& in, const Vector3f& nor) const {
 		//twoside?
-		if (!twoside && Dot(in, nor) < 0) return Vector3f::zero;
+		if (!twoside && Dot(in, nor) < 0) return Vector3f::Zero();
 
 		return radiance;
 	}

@@ -28,7 +28,7 @@ namespace pol {
 		virtual Float Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const = 0;
 
 		virtual Vector3f Le(const Vector3f& in, const Vector3f& nor) const {
-			return Vector3f::zero;
+			return Vector3f::Zero();
 		}
 	};
 }
