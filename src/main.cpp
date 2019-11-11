@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 	vector<Vector3f> vertices, normals;
 	vector<Vector2f> uvs;
 	vector<int> indices;
-	MeshIO::LoadModelFromFile(vertices, normals, uvs, indices, "../assets/cube.obj");
+	MeshIO::LoadModelFromFile(vertices, normals, uvs, indices, "../assets/teapot.obj");
 	
 
 	Scene scene;
@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
 		Perspective(19.5, 1, 0.1, 100), film);
 
 	Bvh* accelerator = CreateBvhAccelerator();
-	Sampler* sampler = CreateRandomSampler(2);
+	Sampler* sampler = CreateRandomSampler(8);
 //	Integrator* integrator = CreateAoIntegrator(0.5);
 //	Integrator* integrator = CreateDirectIntegrator();
 	Integrator* integrator = CreatePathIntegrator();
@@ -93,10 +93,10 @@ int main(int argc, char** argv) {
 	Area* area = CreateAreaLight(Vector3f(12, 12, 12), light);
 	light->SetLight(area);
 
-	Transform trans = TRS(Vector3f(0, 0.25, 0), Vector3f(0, 30, 0), Vector3f(0.5));
-	//vector<Triangle*> triangles = CreateTriangleMeshShape(trans, vertices, normals, uvs, indices, matte);
+	Transform trans = TRS(Vector3f(0, 0, 0), Vector3f(0, 0, 0), Vector3f(0.05));
+	vector<Triangle*> triangles = CreateTriangleMeshShape(trans, vertices, normals, uvs, indices, matte);
 	//vector<Triangle*> triangles = CreateHeightFieldShape(trans, "../assets/terrain-heightmap.png", crete);
-	vector<Triangle*> triangles = CreateSubDivisionShape(4, trans, vertices, normals, uvs, indices, matte);
+	//vector<Triangle*> triangles = CreateSubDivisionShape(4, trans, vertices, normals, uvs, indices, matte);
 	for (int i = 0; i < triangles.size(); ++i) {
 		scene.AddPrimitive(triangles[i]);
 	}
@@ -118,19 +118,19 @@ int main(int argc, char** argv) {
 	scene.AddBsdf(r);
 	scene.AddBsdf(l);
 	scene.AddBsdf(f);
-	scene.AddLight(point);
+	//scene.AddLight(point);
 	//scene.AddLight(spot);
 	//scene.AddLight(distant);
-	//scene.AddLight(area);
+	scene.AddLight(area);
 	//scene.AddLight(infinite);
-//	scene.AddPrimitive(s);
-//	scene.AddPrimitive(s1);
+	//scene.AddPrimitive(s);
+	//scene.AddPrimitive(s1);
 	scene.AddPrimitive(floor);
 	scene.AddPrimitive(ceil);
 	scene.AddPrimitive(back);
 	scene.AddPrimitive(left);
 	scene.AddPrimitive(right);
-	//scene.AddPrimitive(light);
+	scene.AddPrimitive(light);
 
 	scene.Prepare("uniform");
 

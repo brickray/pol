@@ -16,36 +16,25 @@ namespace pol {
 		Vector3f beta(1);
 		Ray r = ray;
 		Intersection isect;
-		bool specular = false;
+		if (scene.Intersect(r, isect)) {
+			//intersect with light?
+			if (isect.light) {
+				return beta * isect.light->Le(-r.d, isect.n);
+			}
+		}
+		else {
+			//intersect nothing, maybe infinite light exists
+			Light* light = scene.GetInfiniteLight();
+			if (light) return beta * light->Le(-r.d, Vector3f::Zero());
+		}
 
 		for (int bounces = 0; bounces < maxDepth; ++bounces) {
-			bool found = scene.Intersect(r, isect);
-
 			Vector3f in = -r.d;
 			Vector3f localIn = isect.shFrame.ToLocal(in);
 			Vector3f p = isect.p;
 			Vector3f n = isect.n;
 			Vector2f uv = isect.uv;
 			Bsdf* bsdf = isect.bsdf;
-
-			if (specular || bounces == 0) {
-				if (found) {
-					//intersect with light?
-					if (isect.light) {
-						L += beta * isect.light->Le(in, n);
-						break;
-					}
-				}
-				else {
-					//background
-					Light* light = scene.GetInfiniteLight();
-					if(light) L += beta * light->Le(in, Vector3f::Zero());
-					break;
-				}
-			}
-
-			//break if there is no intersection found
-			if (!found) break;
 
 			if (bounces == 0) {
 				//prepare differentials 
@@ -58,11 +47,10 @@ namespace pol {
 				isect.dudy = isect.dvdy = 0;
 			}
 
-			//count direct lighting
+			const Distribution1D* lightDistribution = scene.LightLookup(p);
+			//estimate direct lighting
 			if (!bsdf->IsDelta()) {
-				Vector3f Ld(0.f);
 				//sample light
-				const Distribution1D* lightDistribution = scene.LightLookup(p);
 				int lightIdx = lightDistribution->SampleDiscrete(sampler->Next1D());
 				Float choicePdf = lightDistribution->DiscretePdf(lightIdx);
 				Light* light = scene.GetLight(lightIdx);
@@ -84,63 +72,61 @@ namespace pol {
 					if (bsdfPdf != 0) {
 						Float weight = 1;
 						if (!light->IsDelta())
-							weight = PowerHeuristic(1, lightPdf, 1, bsdfPdf);
+							weight = PowerHeuristic(lightPdf, bsdfPdf);
 
-						Ld += weight * fr * radiance * Frame::AbsCosTheta(localOut) / lightPdf;
+						L += beta * weight * fr * radiance * Frame::AbsCosTheta(localOut) / lightPdf;
 					}
 				}
-
-				//sample bsdf
-				Vector3f out;
-				Vector3f fr;
-				Float bsdfPdf;
-				bsdf->SampleBsdf(isect, localIn, sampler->Next2D(), out, fr, bsdfPdf);
-				//if (!bsdfPdf) return L;
-				//the above sentence makes a bug, it should not return when bsdfPdf = 0
-				if (bsdfPdf) {
-					out = isect.shFrame.ToWorld(out);
-					Ray scatterRay(p, out);
-					Intersection scatterIsect;
-					if (scene.Intersect(scatterRay, scatterIsect)) {
-						//here is always area light
-						Light* light = scatterIsect.light;
-						Vector3f radiance;
-						Float lightPdf = 0;
-						if (light) {
-							radiance = light->Le(-out, scatterIsect.n);
-							lightPdf = light->Pdf(scatterIsect.p, p);
-							lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
-						}
-						if (!IsBlack(radiance)) {
-							Float weight = PowerHeuristic(1, bsdfPdf, 1, lightPdf);
-							Ld += weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
-						}
-					}
-					else if (scene.GetInfiniteLight()) {
-						Light* light = scene.GetInfiniteLight();
-						Vector3f radiance = light->Le(-out, Vector3f::Zero());
-						Float lightPdf = light->Pdf(p + out, p);
-						lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
-						Float weight = PowerHeuristic(1, bsdfPdf, 1, lightPdf);
-						Ld += weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
-					}
-				}
-
-				L += beta * Ld;
 			}
 
-			//count indirect lighting
+			//bsdf sampling
 			Vector3f out;
 			Vector3f fr;
 			Float bsdfPdf;
 			bsdf->SampleBsdf(isect, localIn, sampler->Next2D(), out, fr, bsdfPdf);
 			if (bsdfPdf == 0) break;
 
+			//prepare for throughput
 			Float costheta = Frame::AbsCosTheta(out);
 			//transform out direction from local coordinate to world coordinate
 			out = isect.shFrame.ToWorld(out);
+
+			r = Ray(p, out);
+
+			//estimate direct light if needed
+			if (scene.Intersect(r, isect)) {
+				if (isect.light) {
+					//hit a light?
+					Light* light = isect.light;
+					Vector3f radiance;
+					Float lightPdf = 0;
+					radiance = light->Le(-out, isect.n);
+					lightPdf = light->Pdf(isect.p, p);
+					lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
+					if (!IsBlack(radiance)) {
+						Float weight = PowerHeuristic(bsdfPdf, lightPdf);
+						L += beta * weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
+					}
+
+					break;
+				}
+			}
+			else {
+				//if there is infinite light
+				Light* light = scene.GetInfiniteLight();
+				if (light) {
+					Vector3f radiance = light->Le(-out, Vector3f::Zero());
+					Float lightPdf = light->Pdf(p + out, p);
+					lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
+					Float weight = PowerHeuristic(bsdfPdf, lightPdf);
+					L += beta * weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
+				}
+
+				break;
+			}
+
+			//accumulate throughput
 			beta *= fr * costheta / bsdfPdf;
-			specular = bsdf->IsDelta();
 
 			//russian roulette
 			//   e = E[f(x)],   e is expect value of f(x)
@@ -154,8 +140,6 @@ namespace pol {
 				if (sampler->Next1D() < luminance) break;
 				beta /= (1 - luminance);
 			}
-
-			r = Ray(p, out);
 		}
 
 		return L;

@@ -48,16 +48,14 @@ __forceinline Vector3f Reflect(const Vector3f& in, const Vector3f& nor) {
 	return 2 * Dot(in, nor) * nor - in;
 }
 
-__forceinline Float BalanceHeuristic(Float nf, Float fPdf, Float ng, Float gPdf) {
-	Float f = nf * fPdf;
-	Float g = ng * gPdf;
+__forceinline Float BalanceHeuristic(Float f, Float g) {
 	return f / (f + g);
 }
 
-__forceinline Float PowerHeuristic(Float nf, Float fPdf, Float ng, Float gPdf) {
-	Float f = nf * fPdf;
-	Float g = ng * gPdf;
-	return f * f / (f * f + g * g);
+__forceinline Float PowerHeuristic(Float f, Float g) {
+	f *= f;
+	g *= g;
+	return f / (f + g);
 }
 
 
