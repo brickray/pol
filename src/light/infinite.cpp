@@ -88,7 +88,7 @@ namespace pol {
 	}
 
 	Vector3f Infinite::Le(const Vector3f& in, const Vector3f& nor) const {
-		Vector3f dir = world.TransformVectorInverse(-in);
+		Vector3f dir = Normalize(world.TransformVectorInverse(-in));
 		Float theta = SphericalTheta(dir);
 		Float phi = SphericalPhi(dir);
 		Float u = phi * INV2PI;
