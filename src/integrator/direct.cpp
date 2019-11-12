@@ -62,7 +62,7 @@ namespace pol {
 					if (!light->IsDelta())
 						weight = PowerHeuristic(lightPdf, bsdfPdf);
 
-					L += weight * fr * radiance * Frame::AbsCosTheta(localOut) / lightPdf;
+					L += weight * fr * radiance / lightPdf;
 				}
 			}
 
@@ -88,7 +88,7 @@ namespace pol {
 					}
 					if (!IsBlack(radiance)) {
 						Float weight = PowerHeuristic(bsdfPdf, lightPdf);
-						L += weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
+						L += weight * fr * radiance / bsdfPdf;
 					}
 				}
 				else if (scene.GetInfiniteLight()) {
@@ -97,7 +97,7 @@ namespace pol {
 					Float lightPdf = light->Pdf(p + out, p);
 					lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
 					Float weight = PowerHeuristic(bsdfPdf, lightPdf);
-					L += weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
+					L += weight * fr * radiance / bsdfPdf;
 				}
 			}
 		}

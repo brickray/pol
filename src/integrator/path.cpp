@@ -75,7 +75,7 @@ namespace pol {
 						if (!light->IsDelta())
 							weight = PowerHeuristic(lightPdf, bsdfPdf);
 
-						L += beta * weight * fr * radiance * Frame::AbsCosTheta(localOut) / lightPdf;
+						L += beta * weight * fr * radiance / lightPdf;
 					}
 				}
 			}
@@ -86,8 +86,6 @@ namespace pol {
 			bsdf->SampleBsdf(isect, localIn, sampler->Next2D(), out, fr, bsdfPdf);
 			if (bsdfPdf == 0) break;
 
-			//prepare for throughput
-			Float costheta = Frame::AbsCosTheta(out);
 			//transform out direction from local coordinate to world coordinate
 			out = isect.shFrame.ToWorld(out);
 
@@ -108,7 +106,7 @@ namespace pol {
 						//delta bsdf has weight 1
 						if(!bsdf->IsDelta())
 						    weight = PowerHeuristic(bsdfPdf, lightPdf);
-						L += beta * weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
+						L += beta * weight * fr * radiance / bsdfPdf;
 					}
 
 					break;
@@ -122,14 +120,14 @@ namespace pol {
 					Float lightPdf = light->Pdf(p + out, p);
 					lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
 					Float weight = PowerHeuristic(bsdfPdf, lightPdf);
-					L += beta * weight * fr * radiance * fabs(Dot(n, out)) / bsdfPdf;
+					L += beta * weight * fr * radiance / bsdfPdf;
 				}
 
 				break;
 			}
 
 			//accumulate throughput
-			beta *= fr * costheta / bsdfPdf;
+			beta *= fr / bsdfPdf;
 
 			//russian roulette
 			//   e = E[f(x)],   e is expect value of f(x)

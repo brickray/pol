@@ -448,7 +448,7 @@ namespace pol {
 			mesh->Clear();
 		}
 
-	//	MeshIO::WriteObj(subDivVertices, vector<Vector3f>(), vector<Vector2f>(), subDivIndices, "../t.obj");
+		MeshIO::WriteObj(subDivVertices, vector<Vector3f>(), vector<Vector2f>(), subDivIndices, "../t.obj");
 
 	//	printf("vertices size = %d,face size = %d\n", subDivVertices.size(), subDivIndices.size() / 3);
 

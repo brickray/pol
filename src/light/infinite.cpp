@@ -88,6 +88,8 @@ namespace pol {
 	}
 
 	Vector3f Infinite::Le(const Vector3f& in, const Vector3f& nor) const {
+		//dir maybe not normalized after transform due to float point precision
+		//so normalize it
 		Vector3f dir = Normalize(world.TransformVectorInverse(-in));
 		Float theta = SphericalTheta(dir);
 		Float phi = SphericalPhi(dir);

@@ -11,6 +11,8 @@ namespace pol {
 		vector<int> indices;
 		Texture* alphaMask;
 		bool hasTexcoord;
+		//bounding box of  triangle mesh
+		BBox bbox;
 
 		TriangleMesh(const Transform& world, const vector<Vector3f>& p, const vector<Vector3f>& n,
 			const vector<Vector2f>& uv, const vector<int>& indices, Bsdf* bsdf, Texture* alphaMask = nullptr);

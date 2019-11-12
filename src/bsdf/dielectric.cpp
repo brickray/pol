@@ -27,7 +27,7 @@ namespace pol {
 			//calculate reflection direction
 			Vector3f reflectDir = Vector3f(-in.X(), in.Y(), -in.Z());
 			out = reflectDir;
-			fr = specular->Evaluate(isect) / Frame::AbsCosTheta(out);
+			fr = specular->Evaluate(isect);
 			pdf = 1;
 			return;
 		}
@@ -40,7 +40,7 @@ namespace pol {
 			//calculate reflection direction
 			Vector3f reflectDir = Vector3f(-in.X(), in.Y(), -in.Z());
 			out = reflectDir;
-			fr = fresnel * specular->Evaluate(isect) / abs(cosi);
+			fr = fresnel * specular->Evaluate(isect);
 			pdf = fresnel;
 		}
 		else {
@@ -50,7 +50,7 @@ namespace pol {
 			Vector3f refractDir = Vector3f(-in.X() * eta, cost, -in.Z() * eta);
 		
 			out = refractDir;
-			fr = (1 - fresnel) * eta * eta * specular->Evaluate(isect) / abs(cost);
+			fr = (1 - fresnel) * eta * eta * specular->Evaluate(isect);
 			pdf = 1 - fresnel;
 		}
 	}

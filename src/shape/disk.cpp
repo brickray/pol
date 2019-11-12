@@ -104,6 +104,7 @@ namespace pol {
 		string ret;
 		ret += "Disk[\n  world = " + indent(world.ToString())
 			+ ",\n" + "  radius = " + to_string(radius)
+			+ ",\n" + "  bounds = " + indent(WorldBBox().ToString())
 			+ ",\n" + "  bsdf = " + indent(bsdf->ToString())
 			+ ",\n  normal = " + normal.ToString()
 			+ "\n]";

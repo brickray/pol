@@ -102,6 +102,7 @@ namespace pol {
 		string ret;
 		ret += "Quad[\n  world = " + indent(world.ToString())
 			+ ",\n" + "  bsdf = " + indent(bsdf->ToString())
+			+ ",\n" + "  bounds = " + indent(WorldBBox().ToString())
 			+ ",\n  normal = " + normal.ToString()
 			+ "\n]";
 		

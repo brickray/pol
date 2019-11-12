@@ -30,8 +30,8 @@ namespace pol {
 		Float D = GGXD(wh, ax, ay);
 		Float G = GGXG(in, out, wh, ax, ay);
 		fr = specular->Evaluate(isect) * F * D * G /
-			(4 * Frame::AbsCosTheta(in) * Frame::AbsCosTheta(out));
-		pdf = PdfWh(wh, ax, ay) / (4 * fabs(Dot(in, wh)));
+			(4 * Frame::AbsCosTheta(in));
+		pdf = D * Frame::AbsCosTheta(wh) / (4 * fabs(Dot(in, wh)));
 	}
 
 	void RoughConductor::Fr(const Intersection& isect, const Vector3f& in, const Vector3f& out, Vector3f& fr, Float& pdf) const {
@@ -48,8 +48,8 @@ namespace pol {
 		Float D = GGXD(wh, ax, ay);
 		Float G = GGXG(in, out, wh, ax, ay);
 		fr = specular->Evaluate(isect) * F * D * G /
-			(4 * Frame::AbsCosTheta(in) * Frame::AbsCosTheta(out));
-		pdf = PdfWh(wh, ax, ay) / (4 * fabs(Dot(in, wh)));
+			(4 * Frame::AbsCosTheta(in));
+		pdf = D * Frame::AbsCosTheta(wh) / (4 * fabs(Dot(in, wh)));
 	}
 
 	string RoughConductor::ToString() const {

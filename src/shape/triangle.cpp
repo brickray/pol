@@ -7,6 +7,7 @@ namespace pol {
 		//transform triangle mesh to world space
 		for (Vector3f& vertex : this->p) {
 			vertex = world.TransformPoint(vertex);
+			bbox.Union(vertex);
 		}
 
 		if (n.size() == 0) {
@@ -45,7 +46,8 @@ namespace pol {
 			+ ",\n  vertices count = " + to_string(p.size())
 			+ ",\n  normal count = " + to_string(n.size())
 			+ ",\n  uv count = " + to_string(uv.size())
-			+ ",\n  alpha mask = " + (alphaMask ? indent(alphaMask->ToString()) : null);
+			+ ",\n  alpha mask = " + (alphaMask ? indent(alphaMask->ToString()) : null)
+			+ ",\n  bounds = " + indent(bbox.ToString());
 
 		return ret;
 	}

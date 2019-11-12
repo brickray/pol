@@ -14,6 +14,7 @@ namespace pol {
 		virtual ~Bsdf();
 
 		virtual bool IsDelta() const = 0;
+		//evaluate Bsdf*Cos(theta)
 		virtual void SampleBsdf(const Intersection& isect, const Vector3f& in, const Vector2f& u, Vector3f& out, Vector3f& fr, Float& pdf) const = 0;
 		virtual void Fr(const Intersection& isect, const Vector3f& in, const Vector3f& out, Vector3f& fr, Float& pdf) const = 0;
 	};
@@ -148,6 +149,6 @@ namespace pol {
 
 	//pdf 
 	__forceinline Float PdfWh(const Vector3f& wh, Float alphaX, Float alphaY) {
-		return GGXD(wh, alphaX, alphaY) * fabs(wh.Y());
+		return GGXD(wh, alphaX, alphaY) * Frame::AbsCosTheta(wh);
 	}
 }

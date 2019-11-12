@@ -25,6 +25,10 @@ __forceinline int Log2Int(float v) {
 	return (int)floorf(Log2(v));
 }
 
+__forceinline Float Pow5(Float scalar) {
+	return scalar * scalar * scalar * scalar * scalar;
+}
+
 __forceinline Float GetLuminance(const Vector3f & c) {
 	static Vector3f luma(0.212671f, 0.715160f, 0.072169f);
 

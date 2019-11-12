@@ -17,8 +17,8 @@ namespace pol {
 		}
 
 		virtual Vector3f Evaluate(const Intersection& isect) const {
-			int x = isect.uv.x * uscale * 0.5f;
-			int y = isect.uv.y * vscale * 0.5f;
+			int x = isect.uv.x * uscale;
+			int y = isect.uv.y * vscale;
 			return value[(x + y) % 2];
 		}
 
