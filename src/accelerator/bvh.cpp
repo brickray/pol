@@ -55,7 +55,7 @@ namespace pol {
 
 		int bestAxis = -1;
 		int bestBucket;
-		Float bestCost = 1 + bbox.SurfaceArea() * primitives.size();
+		Float bestCost = 1 + primitives.size();
 		Vector3f diagonal = bbox.Diagonal();
 		for (int axis = 0; axis < 3; ++axis) {
 			Bucket bucket[bucketSize];
@@ -85,7 +85,7 @@ namespace pol {
 					countRight += bucket[j].count;
 				}
 
-				//calc cost
+				//compute cost
 				Float cost = 1 + (left.SurfaceArea() * countLeft + right.SurfaceArea() * countRight) / bbox.SurfaceArea();
 				if (cost < bestCost) {
 					bestAxis = axis;
