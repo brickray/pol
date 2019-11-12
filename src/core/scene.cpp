@@ -69,6 +69,29 @@ namespace pol {
 	}
 
 	void Scene::Prepare(const string& lightStrategy) {
+		bool terminal = false;
+		if (!accelerator) {
+			printf("There is no accelerator in the scene\n");
+			terminal = true;
+		}
+		if (!sampler) {
+			printf("There is no sampler in the scene\n");
+			terminal = true;
+		}
+		if (!camera) {
+			printf("There is no camera in the scene\n");
+			terminal = true;
+		}
+
+		for (const Shape* shape : primitives) {
+			if (!shape->GetBsdf()) {
+				printf("At least one shape no bsdf\n");
+				terminal = true;
+			}
+		}
+
+		if (terminal) exit(1);
+
 		//build accelerator
 		if (accelerator) {
 			if (primitives.size() > 20) {

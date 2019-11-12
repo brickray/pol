@@ -10,6 +10,8 @@ namespace pol {
 		Texture* alphaX;
 		Texture* alphaY;
 
+		Float diffuseWeight;
+
 	public:
 		FresnelBlend(Texture* diffuse, Texture* specular, Texture* alphaX, Texture* alphaY);
 

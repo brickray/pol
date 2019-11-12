@@ -26,6 +26,9 @@ namespace pol {
 			//intersect nothing, maybe infinite light exists
 			Light* light = scene.GetInfiniteLight();
 			if (light) return beta * light->Le(-r.d, Vector3f::Zero());
+
+			//no infinite light return 0
+			return L;
 		}
 
 		for (int bounces = 0; bounces < maxDepth; ++bounces) {

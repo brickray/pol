@@ -39,7 +39,7 @@ namespace pol {
 	__forceinline Vector3f SchlickFresnel(const Vector3f& specular, Float costheta) {
 		Vector3f rs = specular;
 		Float c = 1 - costheta;
-		return rs + c * c * c * c * c * (Vector3f::One() - rs);
+		return rs + Pow5(c) * (Vector3f::One() - rs);
 	}
 
 	//microfacet model
