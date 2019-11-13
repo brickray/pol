@@ -94,7 +94,8 @@ namespace pol {
 		solidAngle = false;
 	}
 
-	Float Quad::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {
+	Float Quad::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface, bool& solidAngle) const {
+		solidAngle = false;
 		return 1 / SurfaceArea();
 	}
 

@@ -25,7 +25,7 @@ namespace pol {
 		virtual Float Luminance() const = 0;
 		virtual void SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const = 0;
 
-		virtual Float Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const = 0;
+		virtual Float Pdf(const Intersection& isect, const Vector3f& pOnSurface) const = 0;
 
 		virtual Vector3f Le(const Vector3f& in, const Vector3f& nor) const {
 			return Vector3f::Zero();

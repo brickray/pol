@@ -150,17 +150,15 @@ namespace pol {
 		solidAngle = true;
 	}
 
-	Float Sphere::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {
+	Float Sphere::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface, bool& solidAngle) const {
 		Vector3f center;
 		world.ExtractTranslation(center);
 		//pos to center
 		Vector3f dir = center - pOnSurface;
 		Float costhetaMax = sqrtf(1 - radius * radius / dir.LengthSquare());
 		Float pdf = Warp::UniformConePdf(costhetaMax);
-		Vector3f normal = (pOnLight - center) / radius;
-		dir = pOnSurface - pOnLight;
-		Float lensq = dir.LengthSquare();
-		return pdf * lensq / Dot(normal, Normalize(dir));
+		solidAngle = true;
+		return pdf;
 	}
 
 	//return a human-readable string summary

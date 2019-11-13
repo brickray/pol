@@ -47,8 +47,17 @@ namespace pol {
 		shadowRay = Ray(isect.p, dir, Epsilon, len - Epsilon);
 	}
 
-	Float Area::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {
-		return shape->Pdf(pOnLight, pOnSurface);
+	Float Area::Pdf(const Intersection& isect, const Vector3f& pOnSurface) const {
+		bool solidAngle;
+		Float pdf = shape->Pdf(isect.p, pOnSurface, solidAngle);
+		if (!solidAngle) {
+			Vector3f dir = pOnSurface - isect.p;
+			Float lensq = dir.LengthSquare();
+			Float costheta = fabs(Dot(Normalize(dir), isect.n));
+			pdf *= costheta / lensq;
+		}
+
+		return pdf;
 	}
 
 	Vector3f Area::Le(const Vector3f& in, const Vector3f& nor) const {

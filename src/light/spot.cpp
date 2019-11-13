@@ -43,7 +43,7 @@ namespace pol {
 		shadowRay = Ray(isect.p, dir, Epsilon, len - Epsilon);
 	}
 
-	Float Spot::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {
+	Float Spot::Pdf(const Intersection& isect, const Vector3f& pOnSurface) const {
 		return 0;
 	}
 

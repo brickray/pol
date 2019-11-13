@@ -96,7 +96,8 @@ namespace pol {
 		solidAngle = false;
 	}
 
-	Float Disk::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {
+	Float Disk::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface, bool& solidAngle) const {
+		solidAngle = false;
 		return 1 / SurfaceArea();
 	}
 

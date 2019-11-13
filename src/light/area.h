@@ -20,7 +20,7 @@ namespace pol {
 
 		virtual Vector3f Le(const Vector3f& in, const Vector3f& nor) const;
 
-		virtual Float Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const;
+		virtual Float Pdf(const Intersection& isect, const Vector3f& pOnSurface) const;
 
 		virtual string ToString() const;
 	};

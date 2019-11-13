@@ -16,8 +16,6 @@ namespace pol {
 		Float ax = alphaX->Evaluate(isect).X();
 		Float ay = alphaY->Evaluate(isect).X();
 		Vector3f wh = SampleWh(u, ax, ay);
-		if (Frame::CosTheta(in) < 0)
-			wh = -wh;
 		out = Reflect(in, wh);
 		if (Frame::CosTheta(in) * Frame::CosTheta(out) < 0) {
 			//it may occur at grazing angle
@@ -28,7 +26,7 @@ namespace pol {
 		Float cosi = Dot(out, wh);
 		Vector3f F = ConductFresnel(fabs(cosi), eta, k);
 		Float D = GGXD(wh, ax, ay);
-		Float G = GGXG(in, out, wh, ax, ay);
+		Float G = GGXG(in, out, ax, ay);
 		fr = specular->Evaluate(isect) * F * D * G /
 			(4 * Frame::AbsCosTheta(in));
 		pdf = D * Frame::AbsCosTheta(wh) / (4 * fabs(Dot(in, wh)));
@@ -46,7 +44,7 @@ namespace pol {
 		Float cosi = Dot(out, wh);
 		Vector3f F = ConductFresnel(fabs(cosi), eta, k);
 		Float D = GGXD(wh, ax, ay);
-		Float G = GGXG(in, out, wh, ax, ay);
+		Float G = GGXG(in, out, ax, ay);
 		fr = specular->Evaluate(isect) * F * D * G /
 			(4 * Frame::AbsCosTheta(in));
 		pdf = D * Frame::AbsCosTheta(wh) / (4 * fabs(Dot(in, wh)));

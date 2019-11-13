@@ -83,7 +83,7 @@ namespace pol {
 					Float lightPdf = 0;
 					if (light) {
 						radiance = light->Le(-out, scatterIsect.n);
-						lightPdf = light->Pdf(scatterIsect.p, p);
+						lightPdf = light->Pdf(scatterIsect, p);
 						lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
 					}
 					if (!IsBlack(radiance)) {
@@ -94,7 +94,8 @@ namespace pol {
 				else if (scene.GetInfiniteLight()) {
 					Light* light = scene.GetInfiniteLight();
 					Vector3f radiance = light->Le(-out, Vector3f::Zero());
-					Float lightPdf = light->Pdf(p + out, p);
+					scatterIsect.p = p + out;
+					Float lightPdf = light->Pdf(scatterIsect, p);
 					lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
 					Float weight = PowerHeuristic(bsdfPdf, lightPdf);
 					L += weight * fr * radiance / bsdfPdf;

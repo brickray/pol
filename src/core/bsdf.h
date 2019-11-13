@@ -109,7 +109,7 @@ namespace pol {
 	//        G1(w) = 2 / (1 + sqrt(1 + alpha^2*tan(wh)^2))
 	//and its anisotropic variant is given by
 	//        G1(w) = 2 / (1 + sqrt(1 + tan(wh)^2*(cos(wh)^2*(alphax*alphax) + sin(wh)^2*(alphay*alphay)))
-	__forceinline Float GGXG1(const Vector3f& w, const Vector3f& wh, Float alphaX, Float alphaY) {
+	__forceinline Float GGXG1(const Vector3f& w, Float alphaX, Float alphaY) {
 		Float cosTheta2 = Frame::CosTheta2(w);
 		Float sinTheta2 = Clamp(1 - cosTheta2, Float(0), Float(1));
 		Float tanTheta2 = sinTheta2 / cosTheta2;
@@ -127,8 +127,8 @@ namespace pol {
 	}
 
 	//and the G(wo, wi) = G1(wo)*G1(wi)
-	__forceinline Float GGXG(const Vector3f& wo, const Vector3f& wi, const Vector3f& wh, Float alphaX, Float alphaY) {
-		return GGXG1(wo, wh, alphaX, alphaY) * GGXG1(wi, wh, alphaX, alphaY);
+	__forceinline Float GGXG(const Vector3f& wo, const Vector3f& wi, Float alphaX, Float alphaY) {
+		return GGXG1(wo, alphaX, alphaY) * GGXG1(wi, alphaX, alphaY);
 	}
 
 	//the sample ggx distribution is easy

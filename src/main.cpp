@@ -43,10 +43,10 @@ Scene VeachMis() {
 		Perspective(20.114292, Float(1280) / 720, 0.1, 100), film);
 
 	Bvh* accelerator = CreateBvhAccelerator();
-	Sampler* sampler = CreateRandomSampler(8);
-	//	Integrator* integrator = CreateAoIntegrator(0.5);
-	//	Integrator* integrator = CreateDirectIntegrator();
-	Integrator* integrator = CreatePathIntegrator();
+	Sampler* sampler = CreateRandomSampler(16);
+	//Integrator* integrator = CreateAoIntegrator(0.5);
+	Integrator* integrator = CreateDirectIntegrator();
+	//Integrator* integrator = CreatePathIntegrator();
 
 	Constant* black = CreateConstantTexture(Vector3f::Zero());
 	Lambertian* emission = CreateLambertianBsdf(black);

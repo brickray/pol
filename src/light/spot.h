@@ -20,7 +20,7 @@ namespace pol {
 		virtual Float Luminance() const;
 		virtual void SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const;
 
-		virtual Float Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const;
+		virtual Float Pdf(const Intersection& isect, const Vector3f& pOnSurface) const;
 
 		virtual string ToString() const;
 

@@ -274,7 +274,8 @@ namespace pol {
 		solidAngle = false;
 	}
 
-	Float Triangle::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {
+	Float Triangle::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface, bool& solidAngle) const {
+		solidAngle = false;
 		return 1 / SurfaceArea();
 	}
 

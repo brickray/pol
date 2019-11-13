@@ -75,8 +75,8 @@ namespace pol {
 		shadowRay = Ray(isect.p, dir);
 	}
 
-	Float Infinite::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {
-		Vector3f dir = Normalize(pOnLight - pOnSurface);
+	Float Infinite::Pdf(const Intersection& isect, const Vector3f& pOnSurface) const {
+		Vector3f dir = Normalize(isect.p - pOnSurface);
 		dir = world.TransformVectorInverse(dir);
 		Float theta = SphericalTheta(dir);
 		Float phi = SphericalPhi(dir);

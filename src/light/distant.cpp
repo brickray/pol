@@ -36,7 +36,7 @@ namespace pol {
 		shadowRay = Ray(isect.p, -direction);
 	}
 
-	Float Distant::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface) const {
+	Float Distant::Pdf(const Intersection& isect, const Vector3f& pOnSurface) const {
 		return 0;
 	}
 
