@@ -6,11 +6,14 @@
 
 namespace pol {
 	class Scene;
+	class Shape;
 	class Light : public PolObject {
 	public:
-		Light();
+		Light(const PropSets& props, Scene& scene);
 		virtual ~Light();
 
+		//for area light
+		virtual void SetShape(Shape* s) {};
 		//for distant and infinite light
 		virtual void Prepare(const Scene& scene) {};
 		//point, distant, and spot light are delta

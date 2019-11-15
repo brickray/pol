@@ -48,7 +48,7 @@ namespace pol {
 	class Sampler;
 	class Integrator : public PolObject {
 	public:
-		Integrator();
+		Integrator(const PropSets& props, Scene& scene);
 		virtual ~Integrator();
 
 		virtual Vector3f Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const = 0;

@@ -11,8 +11,9 @@ namespace pol {
 		bool twoside;
 
 	public:
-		Area(const Vector3f& radiance, Shape* shape, bool twoside);
+		Area(const PropSets& props, Scene& scene);
 
+		virtual void SetShape(Shape* s);
 		virtual bool IsDelta() const;
 		virtual bool IsInfinite() const;
 		virtual Float Luminance() const;
@@ -24,6 +25,4 @@ namespace pol {
 
 		virtual string ToString() const;
 	};
-
-	Area* CreateAreaLight(const Vector3f& radiance, Shape* shape, bool twoside = false);
 }

@@ -9,7 +9,7 @@ namespace pol {
 		int sampleCount;
 
 	public:
-		Sampler(int sampleCount);
+		Sampler(const PropSets& props, Scene& scene);
 		virtual ~Sampler();
 
 		virtual void Prepare(uint64_t idx) = 0;

@@ -12,8 +12,7 @@ namespace pol {
 		Float falloff;
 
 	public:
-		Spot(const Vector3f& radiance, const Vector3f& position, const Vector3f& direction,
-			Float total, Float falloff);
+		Spot(const PropSets& props, Scene& scene);
 
 		virtual bool IsDelta() const;
 		virtual bool IsInfinite() const;
@@ -27,6 +26,4 @@ namespace pol {
 	private:
 		Float getFalloff(Float val) const;
 	};
-
-	Spot* CreateSpotLight(const Vector3f& radiance, const Vector3f& position, const Vector3f& direction, Float total = 45, Float falloff = 30);
 }

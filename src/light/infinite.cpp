@@ -1,10 +1,26 @@
 #include "infinite.h"
 #include "../core/scene.h"
 #include "../core/imageio.h"
+#include "../core/directory.h"
 
 namespace pol {
-	Infinite::Infinite(const Transform& world, int w, int h, const vector<Vector3f>& data)
-		:world(world) {
+	POL_REGISTER_CLASS(Infinite, "infinite");
+
+	Infinite::Infinite(const PropSets& props, Scene& scene)
+		:Light(props, scene) {
+		if (props.HasValue("world")) {
+			world = props.GetTransform("world");
+		}
+		else {
+			Vector3f t = props.GetVector3f("translate", Vector3f::Zero());
+			Vector3f r = props.GetVector3f("rotate", Vector3f::Zero());
+			Vector3f s = props.GetVector3f("scale", Vector3f::One());
+			world = TRS(t, r, s);
+		}
+		string file = props.GetString("file");
+		int w, h;
+		vector<Vector3f> data;
+		ImageIO::LoadExr((Directory::GetFullPath(file)).c_str(), w, h, data);
 		image.Build(w, h, data, FilterMode::E_LINEAR, WrapMode::E_REPEAT);
 
 		//consider, for example, a constant-valued environment map: with the p(u,v)
@@ -106,17 +122,5 @@ namespace pol {
 			+ "\n]";
 
 		return ret;
-	}
-
-	Infinite* CreateInfiniteLight(const Transform& world, int w, int h, const vector<Vector3f>& data) {
-		return new Infinite(world, w, h, data);
-	}
-
-	Infinite* CreateInfiniteLight(const Transform& world, const char* file) {
-		int w, h;
-		vector<Vector3f> data;
-		ImageIO::LoadExr(file, w, h, data);
-
-		return CreateInfiniteLight(world, w, h, data);
 	}
 }

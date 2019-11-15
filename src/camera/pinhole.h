@@ -5,7 +5,7 @@
 namespace pol {
 	class Pinhole : public ProjectionCamera {
 	public:
-		Pinhole(const Transform& view, const Transform& projection, Film* film);
+		Pinhole(const PropSets& props, Scene& scene);
 
 		//pinhole camera doesn't consider dof
 		virtual Ray GenerateRay(const Vector2f& cameraSample, const Vector2f& dofSample) const;
@@ -15,6 +15,4 @@ namespace pol {
 		//return a human-readable string summary
 		virtual string ToString() const;
 	};
-
-	Pinhole* CreatePinholeCamera(const Transform& view, const Transform& projection, Film* film);
 }

@@ -1,11 +1,27 @@
 #include "roughconductor.h"
+#include "../core/scene.h"
 
 namespace pol {
-	RoughConductor::RoughConductor(Texture* specular, Texture* alphaX, Texture* alphaY, const Vector3f& eta, const Vector3f& k)
-		:specular(specular)
-		, alphaX(alphaX), alphaY(alphaY)
-		, eta(eta), k(k) {
+	POL_REGISTER_CLASS(RoughConductor, "roughconductor");
 
+	RoughConductor::RoughConductor(const PropSets& props, Scene& scene)
+		:Bsdf(props, scene) {
+		string specName = props.GetString("specular");
+		specular = scene.GetTexture(specName);
+		bool isotropic = props.HasValue("alpha");
+		if (isotropic) {
+			string alphaName = props.GetString("alpha");
+			alphaX = scene.GetTexture(alphaName);
+			alphaY = alphaX;
+		}
+		else {
+			string axName = props.GetString("alphaX");
+			string ayName = props.GetString("alphaY");
+			alphaX = scene.GetTexture(axName);
+			alphaY = scene.GetTexture(ayName);
+		}
+		eta = props.GetVector3f("eta");
+		k = props.GetVector3f("k");
 	}
 
 	bool RoughConductor::IsDelta() const {
@@ -61,10 +77,4 @@ namespace pol {
 
 		return ret;
 	}
-
-	RoughConductor* CreateRoughConductorBsdf(Texture* specular, Texture* alphaX, Texture* alphaY, const Vector3f& eta, const Vector3f& k) {
-		return new RoughConductor(specular, alphaX, alphaY, eta, k);
-	}
-
-
 }

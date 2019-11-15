@@ -6,7 +6,7 @@
 namespace pol {
 	class Texture : public PolObject {
 	public:
-		Texture() {}
+		Texture(const PropSets& props, Scene& scene);
 		virtual ~Texture() {}
 
 		virtual Vector3f Evaluate(const Intersection& isect) const = 0;

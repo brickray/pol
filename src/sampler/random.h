@@ -8,7 +8,7 @@ namespace pol {
 		Rng rng;
 
 	public:
-		Random(int sampleCount);
+		Random(const PropSets& props, Scene& scene);
 
 		virtual void Prepare(uint64_t idx);
 		virtual Float Next1D() const;
@@ -16,6 +16,4 @@ namespace pol {
 
 		virtual string ToString() const;
 	};
-
-	Random* CreateRandomSampler(int sampleCount);
 }

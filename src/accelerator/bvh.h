@@ -24,7 +24,7 @@ namespace pol {
 		vector<BvhNode*> linearNodes;
 
 	public:
-		Bvh();
+		Bvh(const PropSets& props, Scene& scene);
 
 		virtual BBox GetRootBBox() const {
 			return linearNodes[0]->bbox;
@@ -44,6 +44,4 @@ namespace pol {
 		void split(const vector<Shape*>& primitives, const BBox& bbox, int& nextFree);
 		BvhNode* createLeaf(const vector<Shape*>& primitives, const BBox& bbox) const;
 	};
-
-	Bvh* CreateBvhAccelerator();
 }

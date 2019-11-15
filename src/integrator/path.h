@@ -9,12 +9,10 @@ namespace pol {
 		int rrDepth;
 
 	public:
-		Path(int maxDepth, int rrDepth);
+		Path(const PropSets& props, Scene& scene);
 
 		virtual Vector3f Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const;
 
 		virtual string ToString() const;
 	};
-
-	Path* CreatePathIntegrator(int maxDepth = -1, int rrDepth = 5);
 }

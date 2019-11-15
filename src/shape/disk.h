@@ -11,7 +11,7 @@ namespace pol {
 		Vector3f normal;
 
 	public:
-		Disk(const Transform& world, Bsdf* bsdf, Float radius);
+		Disk(const PropSets& props, Scene& scene);
 
 		virtual Float SurfaceArea() const;
 		virtual BBox WorldBBox() const;
@@ -23,6 +23,4 @@ namespace pol {
 		//return a human-readable string summary
 		virtual string ToString() const;
 	};
-
-	Disk* CreateDiskShape(Bsdf* bsdf, const Vector3f& t, const Vector3f& r, Float radius);
 }

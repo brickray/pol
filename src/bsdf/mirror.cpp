@@ -1,9 +1,13 @@
 #include "mirror.h"
+#include "../core/scene.h"
 
 namespace pol {
-	Mirror::Mirror(Texture* specular)
-		:specular(specular) {
+	POL_REGISTER_CLASS(Mirror, "mirror");
 
+	Mirror::Mirror(const PropSets& props, Scene& scene)
+		:Bsdf(props, scene) {
+		string specName = props.GetString("specular");
+		specular = scene.GetTexture(specName);
 	}
 
 	//specular reflection bsdf is a delta bsdf
@@ -28,9 +32,5 @@ namespace pol {
 			+ "\n]";
 
 		return ret;
-	}
-
-	Mirror* CreateMirrorBsdf(Texture* specular) {
-		return new Mirror(specular);
 	}
 }

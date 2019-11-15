@@ -10,7 +10,7 @@ namespace pol {
 		Float radius; //the radius of sphere
 
 	public:
-		Sphere(const Transform& world, Bsdf* bsdf, Float r);
+		Sphere(const PropSets& props, Scene& scene);
 
 		virtual Float SurfaceArea() const;
 		virtual BBox WorldBBox() const;
@@ -22,6 +22,4 @@ namespace pol {
 		//return a human-readable string summary
 		virtual string ToString() const;
 	};
-
-	Sphere* CreateSphereShape(Bsdf* bsdf, const Vector3f& center, Float radius);
 }

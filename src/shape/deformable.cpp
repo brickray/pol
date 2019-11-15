@@ -1,4 +1,5 @@
 #include "deformable.h"
+#include "triangle.h"
 #include "../core/memory.h"
 #include "../core/meshio.h"
 
@@ -331,10 +332,9 @@ namespace pol {
 		return p;
 	}
 
-	vector<Triangle*> CreateSubDivisionShape(int level, const Transform& world, const vector<Vector3f>& p, const vector<Vector3f>& n,
-		const vector<Vector2f>& uv, const vector<int>& indices, Bsdf* bsdf, Texture* alphaMask) {
-		vector<Vector3f> lp = p;
-		vector<int> li = indices;
+	bool CreateSubDivisionShape(int level, TriangleMesh* mesh) {
+		vector<Vector3f> lp = mesh->p;
+		vector<int> li = mesh->indices;
 
 		map<HalfEdgeVertex*, int> subDivHEV;
 		vector<Vector3f> subDivVertices;
@@ -448,10 +448,13 @@ namespace pol {
 			mesh->Clear();
 		}
 
-		MeshIO::WriteObj(subDivVertices, vector<Vector3f>(), vector<Vector2f>(), subDivIndices, "../t.obj");
+	//	MeshIO::WriteObj(subDivVertices, vector<Vector3f>(), vector<Vector2f>(), subDivIndices, "../t.obj");
 
 	//	printf("vertices size = %d,face size = %d\n", subDivVertices.size(), subDivIndices.size() / 3);
 
-		return CreateTriangleMeshShape(world, subDivVertices, vector<Vector3f>(), vector<Vector2f>(), subDivIndices, bsdf, alphaMask);
+		mesh->p = subDivVertices;
+		mesh->indices = subDivIndices;
+
+		return true;
 	}
 }

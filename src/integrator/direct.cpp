@@ -2,6 +2,13 @@
 #include "../core/scene.h"
 
 namespace pol {
+	POL_REGISTER_CLASS(Direct, "direct");
+
+	Direct::Direct(const PropSets& props, Scene& scene)
+		:Integrator(props, scene) {
+
+	}
+
 	//direct integrator is aimed to solve equation 
 	//    Li = Le + ¡ÒFr*Le*cos(t)*dw
 	//Le is direct illumination from light
@@ -111,9 +118,5 @@ namespace pol {
 		ret += "Direct[\n]";
 
 		return ret;
-	}
-
-	Direct* CreateDirectIntegrator() {
-		return new Direct();
 	}
 }

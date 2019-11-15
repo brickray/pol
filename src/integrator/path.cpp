@@ -2,10 +2,13 @@
 #include "../core/scene.h"
 
 namespace pol {
-	Path::Path(int maxDepth, int rrDepth)
-		:maxDepth(maxDepth == -1 ? 65536 : maxDepth)
-		, rrDepth(rrDepth) {
+	POL_REGISTER_CLASS(Path, "path");
 
+	Path::Path(const PropSets& props, Scene& scene)
+		:Integrator(props, scene) {
+		maxDepth = props.GetInt("maxDepth", 65536);
+		if (maxDepth == -1) maxDepth = 65536;
+		rrDepth = props.GetInt("rrDepth", 5);
 	}
 
 	//path integrator is aimed to solve equation 
@@ -123,7 +126,10 @@ namespace pol {
 					isect.p = p + out;
 					Float lightPdf = light->Pdf(isect, p);
 					lightPdf *= lightDistribution->DiscretePdf(scene.GetLightIndex(light));
-					Float weight = PowerHeuristic(bsdfPdf, lightPdf);
+					Float weight = 1;
+					//delta bsdf has weight 1
+					if (!bsdf->IsDelta())
+						weight = PowerHeuristic(bsdfPdf, lightPdf);
 					L += beta * weight * fr * radiance / bsdfPdf;
 				}
 
@@ -157,9 +163,5 @@ namespace pol {
 			+ "\n]";
 
 		return ret;
-	}
-
-	Path* CreatePathIntegrator(int maxDepth, int rrDepth) {
-		return new Path(maxDepth, rrDepth);
 	}
 }

@@ -10,7 +10,7 @@
 namespace pol {
 	class Bsdf : public PolObject {
 	public:
-		Bsdf();
+		Bsdf(const PropSets& props, Scene& scene);
 		virtual ~Bsdf();
 
 		virtual bool IsDelta() const = 0;

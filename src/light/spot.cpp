@@ -1,12 +1,15 @@
 #include "spot.h"
 
 namespace pol {
-	Spot::Spot(const Vector3f& radiance, const Vector3f& position, const Vector3f& direction,
-		Float total, Float falloff)
-		:radiance(radiance), position(position)
-		, direction(direction), total(cos(Radians(total)))
-		, falloff(cos(Radians(falloff))) {
+	POL_REGISTER_CLASS(Spot, "spot");
 
+	Spot::Spot(const PropSets& props, Scene& scene)
+		:Light(props, scene) {
+		radiance = props.GetVector3f("radiance", Vector3f::Zero());
+		position = props.GetVector3f("position", Vector3f::Zero());
+		direction = props.GetVector3f("direction", Vector3f::Up());
+		total = cos(Radians(props.GetFloat("total", 45)));
+		falloff = cos(Radians(props.GetFloat("falloff", 30)));
 	}
 
 	bool Spot::IsDelta() const {
@@ -62,9 +65,5 @@ namespace pol {
 			+ "\n]";
 
 		return ret;
-	}
-
-	Spot* CreateSpotLight(const Vector3f& radiance, const Vector3f& position, const Vector3f& direction, Float total, Float falloff) {
-		return new Spot(radiance, position, Normalize(direction), total, falloff);
 	}
 }

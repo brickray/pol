@@ -1,19 +1,28 @@
 #include "fresnelblend.h"
+#include "../core/scene.h"
 
 namespace pol {
-	FresnelBlend::FresnelBlend(Texture* diffuse, Texture* specular, Texture* alphaX, Texture* alphaY)
-		:diffuse(diffuse), specular(specular)
-		, alphaX(alphaX), alphaY(alphaY) {
-		Intersection isect;
-		isect.uv = Vector2f(0.5, 0.5);
-		Float diff = GetLuminance(diffuse->Evaluate(isect));
-		Float spec = GetLuminance(specular->Evaluate(isect));
-		if (diff == 0 || spec == 0) {
-			diffuseWeight = 0.5;
+	POL_REGISTER_CLASS(FresnelBlend, "fresnelblend");
+
+	FresnelBlend::FresnelBlend(const PropSets& props, Scene& scene)
+		:Bsdf(props, scene) {
+		string diffName = props.GetString("diffuse");
+		string specName = props.GetString("specular");
+		diffuse = scene.GetTexture(diffName);
+		specular = scene.GetTexture(specName);
+		bool isotropic = props.HasValue("alpha");
+		if (isotropic) {
+			string alphaName = props.GetString("alpha");
+			alphaX = scene.GetTexture(alphaName);
+			alphaY = alphaX;
 		}
 		else {
-			diffuseWeight = diff / (diff + spec);
+			string axName = props.GetString("alphaX");
+			string ayName = props.GetString("alphaY");
+			alphaX = scene.GetTexture(axName);
+			alphaY = scene.GetTexture(ayName);
 		}
+		diffuseWeight = props.GetFloat("diffuseWeight", 0.5);
 	}
 
 	bool FresnelBlend::IsDelta() const {
@@ -102,9 +111,5 @@ namespace pol {
 			+ "\n]";
 
 		return ret;
-	}
-
-	FresnelBlend* CreateFresnelBlendBsdf(Texture* diffuse, Texture* specular, Texture* alphaX, Texture* alphaY) {
-		return new FresnelBlend(diffuse, specular, alphaX, alphaY);
 	}
 }

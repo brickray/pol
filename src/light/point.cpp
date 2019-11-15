@@ -1,9 +1,12 @@
 #include "point.h"
 
 namespace pol {
-	Point::Point(const Vector3f& radiance, const Vector3f& position)
-		:radiance(radiance), position(position) {
+	POL_REGISTER_CLASS(Point, "point");
 
+	Point::Point(const PropSets& props, Scene& scene)
+		:Light(props, scene) {
+		radiance = props.GetVector3f("radiance", Vector3f::Zero());
+		position = props.GetVector3f("position", Vector3f::Zero());
 	}
 
 	bool Point::IsDelta() const {
@@ -45,9 +48,5 @@ namespace pol {
 			+ "\n]";
 
 		return ret;
-	}
-
-	Point* CreatePointLight(const Vector3f& radiance, const Vector3f& position) {
-		return new Point(radiance, position);
 	}
 }

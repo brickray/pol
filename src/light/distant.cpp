@@ -2,9 +2,12 @@
 #include "../core/scene.h"
 
 namespace pol {
-	Distant::Distant(const Vector3f& radiance, const Vector3f& direction)
-		:radiance(radiance), direction(direction) {
+	POL_REGISTER_CLASS(Distant, "distant");
 
+	Distant::Distant(const PropSets& props, Scene& scene)
+		:Light(props, scene) {
+		radiance = props.GetVector3f("radiance", Vector3f::Zero());
+		direction = props.GetVector3f("direction", Vector3f::Up());
 	}
 
 	void Distant::Prepare(const Scene& scene) {
@@ -47,9 +50,5 @@ namespace pol {
 			+ "\n]";
 
 		return ret;
-	}
-
-	Distant* CreateDistantLight(const Vector3f& radiance, const Vector3f& direction) {
-		return new Distant(radiance, Normalize(direction));
 	}
 }

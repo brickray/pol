@@ -18,7 +18,7 @@ namespace pol {
 		Float radius;
 
 	public:
-		Infinite(const Transform& world, int w, int h, const vector<Vector3f>& data);
+		Infinite(const PropSets& props, Scene& scene);
 
 		virtual void Prepare(const Scene& scene);
 		virtual bool IsDelta() const;
@@ -31,7 +31,4 @@ namespace pol {
 
 		virtual string ToString() const;
 	};
-
-	Infinite* CreateInfiniteLight(const Transform& world, int w, int h, const vector<Vector3f>& data);
-	Infinite* CreateInfiniteLight(const Transform& world, const char* file);
 }

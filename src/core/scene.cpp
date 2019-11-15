@@ -15,8 +15,8 @@ namespace pol {
 		POL_SAFE_DELETE(integrator);
 		POL_SAFE_DELETE(accelerator);
 
-		for (Texture* texture : textures) POL_SAFE_DELETE(texture);
-		for (Bsdf* bsdf : bsdfs) POL_SAFE_DELETE(bsdf);
+		for (TextureIterator it = textures.begin(); it != textures.end(); ++it) POL_SAFE_DELETE(it->second);
+		for (BsdfIterator it = bsdfs.begin(); it != bsdfs.end(); ++it) POL_SAFE_DELETE(it->second);
 		for (Shape* shape : primitives) POL_SAFE_DELETE(shape);
 		for (Light* light : lights) POL_SAFE_DELETE(light);
 	}
@@ -50,28 +50,31 @@ namespace pol {
 	}
 
 	void Scene::AddLight(Light* l) {
-		if (l->IsInfinite()) {
-			if(!infinite) infinite = l;
-			else {
-				//two infinite light? not allowed
-
-			}
-		}
 		lights.push_back(l);
 	}
 
-	void Scene::AddBsdf(Bsdf* b) {
-		bsdfs.push_back(b);
+	void Scene::AddBsdf(const string& name, Bsdf* b) {
+		if (bsdfs.find(name) != bsdfs.end()) {
+			fprintf(stderr, "bsdf named [\"%s\"] already exists\n", name.c_str());
+			return;
+		}
+
+		bsdfs[name] = b;
 	}
 
-	void Scene::AddTexture(Texture* t) {
-		textures.push_back(t);
+	void Scene::AddTexture(const string& name, Texture* t) {
+		if (textures.find(name) != textures.end()) {
+			fprintf(stderr, "texture named [\"%s\"] already exists\n", name.c_str());
+			return;
+		}
+
+		textures[name] = t;
 	}
 
 	void Scene::Prepare(const string& lightStrategy) {
 		bool terminal = false;
-		if (!accelerator) {
-			printf("There is no accelerator in the scene\n");
+		if (!integrator) {
+			printf("There is no integrator in the scene\n");
 			terminal = true;
 		}
 		if (!sampler) {
@@ -111,6 +114,7 @@ namespace pol {
 		//light prepare
 		for (Light* light : lights) {
 			light->Prepare(*this);
+			if (light->IsInfinite()) infinite = light;
 		}
 
 		//construct light distribution.

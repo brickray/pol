@@ -2,9 +2,11 @@
 #include "../core/scene.h"
 
 namespace pol {
-	Ao::Ao(Float maxDist)
-		:maxDist(maxDist) {
+	POL_REGISTER_CLASS(Ao, "ao");
 
+	Ao::Ao(const PropSets& props, Scene& scene)
+		:Integrator(props, scene) {
+		maxDist = props.GetFloat("maxDist", 2);
 	}
 
 	//ao integrator is aimed to solve equation 
@@ -44,9 +46,5 @@ namespace pol {
 		ret += "Ao[\n  maxDist = " + to_string(maxDist) + "\n]";
 
 		return ret;
-	}
-
-	Ao* CreateAoIntegrator(Float maxDist) {
-		return new Ao(maxDist);
 	}
 }

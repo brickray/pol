@@ -1,8 +1,10 @@
 #include "pinhole.h"
 
 namespace pol {
-	Pinhole::Pinhole(const Transform& view, const Transform& projection, Film* film)
-		:ProjectionCamera(view, projection, film) {
+	POL_REGISTER_CLASS(Pinhole, "pinhole");
+
+	Pinhole::Pinhole(const PropSets& props, Scene& scene)
+		:ProjectionCamera(props, scene) {
 		Vector2f invRes = Float(1) / Vector2f(film->res);
 		auto NDC = [invRes](const Vector2f& pixel)->Vector3f {
 			Vector2f raster = (pixel * invRes - Vector2f(0.5))* Float(2);
@@ -72,9 +74,5 @@ namespace pol {
 			+ "]\n  ]\n]";
 		
 		return ret;
-	}
-
-	Pinhole* CreatePinholeCamera(const Transform& view, const Transform& projection, Film* film) {
-		return new Pinhole(view, projection, film);
 	}
 }

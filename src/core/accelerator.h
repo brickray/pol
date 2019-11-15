@@ -7,7 +7,7 @@ namespace pol {
 	class Shape;
 	class Accelerator : public PolObject {
 	public:
-		Accelerator();
+		Accelerator(const PropSets& props, Scene& scene);
 		virtual ~Accelerator();
 
 		virtual BBox GetRootBBox() const = 0;

@@ -4,7 +4,9 @@
 #include "../core/texture.h"
 
 namespace pol {
-	struct TriangleMesh {
+	class Triangle;
+	class TriangleMesh : public PolObject {
+	public:
 		vector<Vector3f> p;
 		vector<Vector3f> n;
 		vector<Vector2f> uv;
@@ -14,9 +16,14 @@ namespace pol {
 		//bounding box of  triangle mesh
 		BBox bbox;
 
-		TriangleMesh(const Transform& world, const vector<Vector3f>& p, const vector<Vector3f>& n,
-			const vector<Vector2f>& uv, const vector<int>& indices, Bsdf* bsdf, Texture* alphaMask = nullptr);
-	
+		//temporary storage
+		//once the SetLight function has been called,
+		//triangles will be all cleared
+		vector<Triangle*> triangles;
+
+	public:
+		TriangleMesh(const PropSets& props, Scene& scene);
+
 		string ToString() const;
 	};
 
@@ -25,7 +32,7 @@ namespace pol {
 		const shared_ptr<TriangleMesh> mesh;
 		int faceIndex;
 	public:
-		Triangle(const Transform& world, Bsdf* bsdf, const shared_ptr<TriangleMesh>& mesh, int faceIndex);
+		Triangle(const PropSets& props, Scene& scene, const shared_ptr<TriangleMesh>& mesh, int faceIndex);
 
 		virtual Float SurfaceArea() const;
 		virtual BBox WorldBBox() const;
@@ -37,7 +44,4 @@ namespace pol {
 		//return a human-readable string summary
 		virtual string ToString() const;
 	};
-
-	vector<Triangle*> CreateTriangleMeshShape(const Transform& world, const vector<Vector3f>& p, const vector<Vector3f>& n,
-		const vector<Vector2f>& uv, const vector<int>& indices, Bsdf* bsdf, Texture* alphaMask = nullptr);
 }

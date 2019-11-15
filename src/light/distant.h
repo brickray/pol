@@ -13,7 +13,7 @@ namespace pol {
 		Float radius;
 
 	public:
-		Distant(const Vector3f& radiance, const Vector3f& direction);
+		Distant(const PropSets& props, Scene& scene);
 
 		virtual void Prepare(const Scene& scene);
 		virtual bool IsDelta() const;
@@ -25,6 +25,4 @@ namespace pol {
 
 		virtual string ToString() const;
 	};
-
-	Distant* CreateDistantLight(const Vector3f& radiance, const Vector3f& direction);
 }

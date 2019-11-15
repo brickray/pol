@@ -1,9 +1,13 @@
 #include "lambertian.h"
+#include "../core/scene.h"
 
 namespace pol {
-	Lambertian::Lambertian(Texture* diffuse)
-		:diffuse(diffuse) {
+	POL_REGISTER_CLASS(Lambertian, "lambertian");
 
+	Lambertian::Lambertian(const PropSets& props, Scene& scene)
+		:Bsdf(props, scene) {
+		string diffName = props.GetString("diffuse");
+		diffuse = scene.GetTexture(diffName);
 	}
 
 	bool Lambertian::IsDelta() const {
@@ -37,9 +41,5 @@ namespace pol {
 			+ "\n]";
 
 		return ret;
-	}
-
-	Lambertian* CreateLambertianBsdf(Texture* diffuse) {
-		return new Lambertian(diffuse);
 	}
 }

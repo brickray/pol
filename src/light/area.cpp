@@ -1,9 +1,16 @@
 #include "area.h"
 
 namespace pol {
-	Area::Area(const Vector3f& radiance, Shape* shape, bool twoside)
-		:radiance(radiance), shape(shape), twoside(twoside) {
+	POL_REGISTER_CLASS(Area, "area");
 
+	Area::Area(const PropSets& props, Scene& scene)
+		:Light(props, scene) {
+		radiance = props.GetVector3f("radiance", Vector3f::Zero());
+		twoside = props.GetBool("twoside", false);
+	}
+
+	void Area::SetShape(Shape* s) {
+		shape = s;
 	}
 
 	bool Area::IsDelta() const {
@@ -54,7 +61,7 @@ namespace pol {
 			Vector3f dir = pOnSurface - isect.p;
 			Float lensq = dir.LengthSquare();
 			Float costheta = fabs(Dot(Normalize(dir), isect.n));
-			pdf *= costheta / lensq;
+			pdf *= lensq / costheta;
 		}
 
 		return pdf;
@@ -75,9 +82,5 @@ namespace pol {
 			+ "\n]";
 
 		return ret;
-	}
-
-	Area* CreateAreaLight(const Vector3f& radiance, Shape* shape, bool twoside) {
-		return new Area(radiance, shape, twoside);
 	}
 }

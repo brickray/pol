@@ -1,9 +1,15 @@
 #include "dielectric.h"
+#include "../core/scene.h"
 
 namespace pol {
-	Dielectric::Dielectric(Texture* specular, Float etai, Float etat)
-		:specular(specular), etai(etai), etat(etat) {
+	POL_REGISTER_CLASS(Dielectric, "dielectric");
 
+	Dielectric::Dielectric(const PropSets& props, Scene& scene)
+		:Bsdf(props, scene) {
+		string specName = props.GetString("specular");
+		specular = scene.GetTexture(specName);
+		etai = props.GetFloat("etaOutside");
+		etat = props.GetFloat("etaInside");
 	}
 
 	//dielectic is a delta bsdf
@@ -68,9 +74,5 @@ namespace pol {
 			+ "\n]";
 
 		return ret;
-	}
-
-	Dielectric* CreateDielectricBsdf(Texture* specular, Float etai, Float etat) {
-		return new Dielectric(specular, etai, etat);
 	}
 }

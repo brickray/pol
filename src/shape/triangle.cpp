@@ -1,9 +1,40 @@
 #include "triangle.h"
+#include "heightfield.h"
+#include "deformable.h"
+#include "../core/meshio.h"
+#include "../core/scene.h"
+#include "../core/directory.h"
 
 namespace pol {
-	TriangleMesh::TriangleMesh(const Transform& world, const vector<Vector3f>& p, const vector<Vector3f>& n,
-		const vector<Vector2f>& uv, const vector<int>& indices, Bsdf* bsdf, Texture* alphaMask)
-		:p(p), n(n), uv(uv), indices(indices), alphaMask(alphaMask) {
+	POL_REGISTER_CLASS(TriangleMesh, "trianglemesh");
+
+	TriangleMesh::TriangleMesh(const PropSets& props, Scene& scene) {
+		Transform world;
+		if (props.HasValue("world")) {
+			world = props.GetTransform("world");
+		}
+		else {
+			Vector3f t = props.GetVector3f("translate", Vector3f::Zero());
+			Vector3f r = props.GetVector3f("rotate", Vector3f::Zero());
+			Vector3f s = props.GetVector3f("scale", Vector3f::One());
+			world = TRS(t, r, s);
+		}
+		string am = props.GetString("alphaMask");
+		alphaMask = scene.GetTexture(am);
+		if (props.HasValue("heightfield")) {
+			string file = props.GetString("file");
+			CreateHeightFieldShape((Directory::GetFullPath(file)).c_str(), this);
+		}
+		else {
+			//load mesh
+			string file = props.GetString("file");
+			MeshIO::LoadModelFromFile(p, n, uv, indices, (Directory::GetFullPath(file)).c_str());
+			if (props.HasValue("subdivision")) {
+				int level = props.GetInt("level", 4);
+				CreateSubDivisionShape(level, this);
+			}
+		}
+
 		//transform triangle mesh to world space
 		for (Vector3f& vertex : this->p) {
 			vertex = world.TransformPoint(vertex);
@@ -37,6 +68,14 @@ namespace pol {
 		}
 
 		hasTexcoord = uv.size() != 0;
+
+		//create triangle
+		shared_ptr<TriangleMesh> mesh = shared_ptr<TriangleMesh>(this);
+		int nTriangles = indices.size() / 3;
+		triangles.resize(nTriangles);
+		for (int i = 0; i < nTriangles; ++i) {
+			triangles[i] = new Triangle(props, scene, mesh, i);
+		}
 	}
 
 	string TriangleMesh::ToString() const {
@@ -52,23 +91,8 @@ namespace pol {
 		return ret;
 	}
 
-	vector<Triangle*> CreateTriangleMeshShape(const Transform& world, const vector<Vector3f>& p, const vector<Vector3f>& n,
-		const vector<Vector2f>& uv, const vector<int>& indices, Bsdf* bsdf, Texture* alphaMask) {
-		//auto release
-		shared_ptr<TriangleMesh> mesh = shared_ptr<TriangleMesh>(new TriangleMesh(world, p, n, uv, indices, bsdf, alphaMask));
-
-		int nTriangles = indices.size() / 3;
-		vector<Triangle*> triangles;
-		triangles.reserve(nTriangles);
-		for (int i = 0; i < nTriangles; ++i) {
-			triangles.push_back(new Triangle(world, bsdf, mesh, i));
-		}
-
-		return triangles;
-	}
-
-	Triangle::Triangle(const Transform& world, Bsdf* bsdf, const shared_ptr<TriangleMesh>& mesh, int faceIndex)
-		:Shape(bsdf), mesh(mesh), faceIndex(3 * faceIndex) {
+	Triangle::Triangle(const PropSets& props, Scene& scene, const shared_ptr<TriangleMesh>& mesh, int faceIndex)
+		:Shape(props, scene), mesh(mesh), faceIndex(3 * faceIndex) {
 
 	}
 

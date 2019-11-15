@@ -2,7 +2,10 @@
 #include "../core/shape.h"
 
 namespace pol {
-	Bvh::Bvh() {
+	POL_REGISTER_CLASS(Bvh, "bvh");
+
+	Bvh::Bvh(const PropSets& props, Scene& scene)
+		:Accelerator(props, scene) {
 
 	}
 
@@ -216,9 +219,5 @@ namespace pol {
             + "\n]";
 
 		return ret;
-	}
-
-	Bvh* CreateBvhAccelerator() {
-		return new Bvh();
 	}
 }

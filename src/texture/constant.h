@@ -8,9 +8,9 @@ namespace pol {
 		Vector3f value;
 
 	public:
-		Constant(const Vector3f& value)
-			:value(value) {
-
+		Constant(const PropSets& props, Scene& scene)
+			:Texture(props, scene) {
+			value = props.GetVector3f("value", Vector3f::One());
 		}
 
 		Vector3f Evaluate(const Intersection& isect) const {
@@ -24,6 +24,4 @@ namespace pol {
 			return ret;
 		}
 	};
-
-	Constant* CreateConstantTexture(const Vector3f& value);
 }

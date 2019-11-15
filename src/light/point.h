@@ -9,7 +9,7 @@ namespace pol {
 		Vector3f position;
 
 	public:
-		Point(const Vector3f& radiance, const Vector3f& position);
+		Point(const PropSets& props, Scene& scene);
 
 		virtual bool IsDelta() const;
 		virtual bool IsInfinite() const;
@@ -20,6 +20,4 @@ namespace pol {
 
 		virtual string ToString() const;
 	};
-
-	Point* CreatePointLight(const Vector3f& radiance, const Vector3f& position);
 }

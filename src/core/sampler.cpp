@@ -1,9 +1,10 @@
 #include "sampler.h"
+#include "scene.h"
 
 namespace pol {
-	Sampler::Sampler(int sampleCount)
-	:sampleCount(sampleCount){
-
+	Sampler::Sampler(const PropSets& props, Scene& scene) {
+		sampleCount = props.GetInt("sampleCount", 32);
+		scene.SetSampler(this);
 	}
 
 	Sampler::~Sampler() {

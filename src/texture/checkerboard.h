@@ -10,10 +10,12 @@ namespace pol {
 		Float vscale;
 
 	public:
-		Checkerboard(const Vector3f& first, const Vector3f& second, Float uscale, Float vscale)
-			: uscale(uscale), vscale(vscale) {
-			value[0] = first;
-			value[1] = second;
+		Checkerboard(const PropSets& props, Scene& scene)
+			:Texture(props, scene) {
+			value[0] = props.GetVector3f("first", Vector3f::Zero());
+			value[1] = props.GetVector3f("second", Vector3f::One());
+			uscale = props.GetFloat("uscale", 10);
+			vscale = props.GetFloat("vscale", 10);
 		}
 
 		virtual Vector3f Evaluate(const Intersection& isect) const {
@@ -33,6 +35,4 @@ namespace pol {
 			return ret;
 		}
 	};
-
-	Checkerboard* CreateCheckerboardTexture(const Vector3f& first, const Vector3f& second, Float uscale, Float vscale);
 }

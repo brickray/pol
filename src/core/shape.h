@@ -6,6 +6,7 @@
 
 namespace pol {
 	class Light;
+	class Scene;
 	class Shape : public PolObject {
 	protected:
 		//material of shape
@@ -14,7 +15,8 @@ namespace pol {
 		Light* light;
 
 	public:
-		Shape(Bsdf* bsdf);
+		Shape() {}
+		Shape(const PropSets& props, Scene& scene);
 		virtual ~Shape();
 
 		virtual Float SurfaceArea() const = 0;
@@ -29,12 +31,7 @@ namespace pol {
 		//soldAngle : pdf in which type (area or solidAngle)
 		virtual Float Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface, bool& solidAngle) const = 0;
 
-		const Bsdf* GetBsdf() const {
-			return bsdf;
-		}
-
-		void SetLight(Light* l) {
-			light = l;
-		}
+		virtual void SetLight(Light* l) { light = l; }
+		const Bsdf* GetBsdf() const { return bsdf;  }
 	};
 }

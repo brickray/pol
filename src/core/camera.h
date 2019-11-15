@@ -13,7 +13,7 @@ namespace pol {
 		Film* film;
 
 	public:
-		Camera(const Transform& view, Film* film);
+		Camera(const PropSets& props, Scene& scene);
 		virtual ~Camera();
 
 		//generate primiary ray from given sample point
@@ -31,7 +31,7 @@ namespace pol {
 		Vector3f dxCamera, dyCamera;
 
 	public:
-		ProjectionCamera(const Transform& view, const Transform& projection, Film* film);
+		ProjectionCamera(const PropSets& props, Scene& scene);
 		virtual ~ProjectionCamera();
 	};
 }

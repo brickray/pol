@@ -2,6 +2,7 @@
 
 #include "../core/texture.h"
 #include "../core/mipmap.h"
+#include "../core/imageio.h"
 
 namespace pol {
 	class Image : public Texture {
@@ -9,7 +10,33 @@ namespace pol {
 		Mipmap image;
 
 	public:
-		Image(int w, int h, const vector<Vector3f>& data, FilterMode fmode, WrapMode wmode) {
+		Image(const PropSets& props, Scene& scene)
+			:Texture(props, scene) {
+			string file = props.GetString("file");
+			if (file == "") {
+				fprintf(stderr, "Please specific file name\n");
+				return;
+			}
+			bool srgb = props.GetBool("srgb", true);
+			string filtermode = props.GetString("filtermode", "trilinear");
+			string wrapmode = props.GetString("wrapmode", "repeat");
+			FilterMode fmode;
+			if (filtermode == "nearst") fmode = FilterMode::E_NEARST;
+			else if (filtermode == "linear") fmode = FilterMode::E_LINEAR;
+			else if (filtermode == "trilinear") fmode = FilterMode::E_TRILINEAR;
+			else fmode = FilterMode::E_TRILINEAR;
+
+			WrapMode wmode;
+			if (wrapmode == "clamp") wmode = WrapMode::E_CLAMP;
+			else if (wrapmode == "mirror") wmode = WrapMode::E_MIRROR;
+			else if (wrapmode == "repeat") wmode = WrapMode::E_REPEAT;
+			else wmode = WrapMode::E_REPEAT;
+
+			int w, h;
+			vector<Vector3f> data;
+			ImageIO::LoadTexture(file.c_str(), w, h, srgb, data);
+
+			//build mipmap
 			image.Build(w, h, data, fmode, wmode);
 		}
 
@@ -25,7 +52,4 @@ namespace pol {
 			return ret;
 		}
 	};
-
-	Image* CreateImageTexture(int w, int h, const vector<Vector3f>& data, FilterMode fmode = FilterMode::E_TRILINEAR, WrapMode wmode = WrapMode::E_REPEAT);
-	Image* CreateImageTexture(const char* file, FilterMode fmode = FilterMode::E_TRILINEAR, WrapMode wmode = WrapMode::E_REPEAT);
 }

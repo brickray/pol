@@ -10,7 +10,7 @@ namespace pol {
 		Vector3f normal;
 
 	public:
-		Quad(const Transform& world, Bsdf* bsdf);
+		Quad(const PropSets& props, Scene& scene);
 
 		virtual Float SurfaceArea() const;
 		virtual BBox WorldBBox() const;
@@ -22,6 +22,4 @@ namespace pol {
 		//return a human-readable string summary
 		virtual string ToString() const;
 	};
-
-	Quad* CreateQuadShape(Bsdf* bsdf, const Vector3f& t, const Vector3f& r, const Vector3f& s);
 }

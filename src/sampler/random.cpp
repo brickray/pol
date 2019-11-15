@@ -1,8 +1,10 @@
 #include "random.h"
 
 namespace pol {
-	Random::Random(int sampleCount)
-		:Sampler(sampleCount) {
+	POL_REGISTER_CLASS(Random, "random");
+
+	Random::Random(const PropSets& props, Scene& scene)
+		:Sampler(props, scene) {
 
 	}
 
@@ -23,9 +25,5 @@ namespace pol {
 		string ret;
 		ret = "Random[\n  SampleCount = " + to_string(sampleCount) + "\n]";
 		return ret;
-	}
-
-	Random* CreateRandomSampler(int sampleCount) {
-		return new Random(sampleCount);
 	}
 }

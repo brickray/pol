@@ -8,12 +8,10 @@ namespace pol {
 		Float maxDist;
 
 	public:
-		Ao(Float maxDist);
+		Ao(const PropSets& props, Scene& scene);
 
 		virtual Vector3f Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const;
 
 		virtual string ToString() const;
 	};
-
-	Ao* CreateAoIntegrator(Float maxDist = 2.0);
 }

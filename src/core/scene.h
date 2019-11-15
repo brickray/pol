@@ -23,8 +23,12 @@ namespace pol {
 		vector<Shape*> primitives;
 		vector<Light*> lights;
 		Light* infinite;
-		vector<Bsdf*> bsdfs;
-		vector<Texture*> textures;
+		typedef map<string, Bsdf*>::iterator BsdfIterator;
+		typedef map<string, Bsdf*>::const_iterator ConstBsdfIterator;
+		typedef map<string, Texture*>::iterator TextureIterator;
+		typedef map<string, Texture*>::const_iterator ConstTextureIterator;
+		map<string, Bsdf*> bsdfs;
+		map<string, Texture*> textures;
 
 		LightDistribution* lightDistribution;
 		BBox worldBBox;
@@ -40,8 +44,8 @@ namespace pol {
 
 		void AddPrimitive(Shape* s);
 		void AddLight(Light* l);
-		void AddBsdf(Bsdf* b);
-		void AddTexture(Texture* t);
+		void AddBsdf(const string& name, Bsdf* b);
+		void AddTexture(const string& name, Texture* t);
 
 		__forceinline Camera* GetCamera() const { return camera; }
 		__forceinline Sampler* GetSampler() const { return sampler; }
@@ -52,8 +56,8 @@ namespace pol {
 		__forceinline Light* GetInfiniteLight() const { return infinite; }
 		__forceinline int GetLightIndex(const Light* l) const { for (int i = 0; i < lights.size(); ++i) if (lights[i] == l) return i; return -1; }
 		__forceinline Shape* GetShape(int idx) const { POL_ASSERT(idx < primitives.size()); return primitives[idx]; }
-		__forceinline Bsdf* GetBsdf(int idx) const { POL_ASSERT(idx < bsdfs.size()); return bsdfs[idx]; }
-		__forceinline Texture* GetTexture(int idx) const { POL_ASSERT(idx < textures.size()); return textures[idx]; }
+		__forceinline Bsdf* GetBsdf(string& name) const { ConstBsdfIterator it = bsdfs.find(name);  if (it == bsdfs.end()) return nullptr;  return it->second; }
+		__forceinline Texture* GetTexture(string& name) const { ConstTextureIterator it = textures.find(name); if (it == textures.end()) return nullptr; return it->second; }
 		__forceinline BBox GetBBox() const { return worldBBox; }
 
 		//prepare before rendering
