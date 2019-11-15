@@ -1,5 +1,6 @@
 #include "mipmap.h"
 #include "memory.h"
+#include "imageio.h"
 
 namespace pol {
 	Mipmap::Mipmap() {
@@ -122,7 +123,7 @@ namespace pol {
 			if (level < 0) {
 				color = triangle(0, uv);
 			}
-			else if (level > PyramidCount() - 1) {
+			else if (level >= PyramidCount() - 1) {
 				//the last pyramid only contains one pixel,
 				//so just set texture coordinate to 0
 				color = triangle(PyramidCount() - 1, Vector2f(0, 0));
@@ -182,6 +183,13 @@ namespace pol {
 		 	 + (1 - dy) * dx * ti.data[y * ti.w + nextX]
 			 + dy * (1 - dx) * ti.data[nextY * ti.w + x]
 			 + dy * dx * ti.data[nextY * ti.w + nextX];
+	}
+
+	void Mipmap::WritePyramid(const string& directory) const {
+		for (int i = 0; i < PyramidCount(); ++i) {
+			string file = directory + "/" + to_string(i) + ".png";
+			ImageIO::SavePng(file.c_str(), pyramid[i].w, pyramid[i].h, pyramid[i].data);
+		}
 	}
 
 	string Mipmap::ToString() const {

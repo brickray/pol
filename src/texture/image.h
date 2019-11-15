@@ -3,6 +3,7 @@
 #include "../core/texture.h"
 #include "../core/mipmap.h"
 #include "../core/imageio.h"
+#include "../core/directory.h"
 
 namespace pol {
 	class Image : public Texture {
@@ -32,9 +33,11 @@ namespace pol {
 			else if (wrapmode == "repeat") wmode = WrapMode::E_REPEAT;
 			else wmode = WrapMode::E_REPEAT;
 
+			bool flip = props.GetBool("flip", true);
+
 			int w, h;
 			vector<Vector3f> data;
-			ImageIO::LoadTexture(file.c_str(), w, h, srgb, data);
+			ImageIO::LoadTexture(Directory::GetFullPath(file).c_str(), w, h, srgb, flip, data);
 
 			//build mipmap
 			image.Build(w, h, data, fmode, wmode);

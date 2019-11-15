@@ -94,7 +94,7 @@ Scene VeachMis() {
 
 int main(int argc, char** argv) {
 	Scene scene;
-	if (!Parser::Parse("../scenes/coffee/scene.json", scene)) {
+	if (!Parser::Parse("../scenes/pbrt_book/scene.json", scene)) {
 		return 1;
 	}
 

@@ -34,4 +34,28 @@ namespace pol {
 		virtual void SetLight(Light* l) { light = l; }
 		const Bsdf* GetBsdf() const { return bsdf;  }
 	};
+
+	//helper function
+	__forceinline Transform GetWorldTransform(const PropSets& props) {
+		Transform world;
+		if (props.HasValue("world")) {
+			world = props.GetTransform("world");
+		}
+		else {
+			Vector3f t = props.GetVector3f("translate", Vector3f::Zero());
+			Vector3f s = props.GetVector3f("scale", Vector3f::One());
+			if (props.HasValue("axis")) {
+				Vector3f axis = props.GetVector3f("axis");
+				Float angle = props.GetFloat("angle");
+
+				world = TRS(t, axis, angle, s);
+			}
+			else {
+				Vector3f r = props.GetVector3f("rotate", Vector3f::Zero());
+				world = TRS(t, r, s);
+			}
+		}
+
+		return world;
+	}
 }

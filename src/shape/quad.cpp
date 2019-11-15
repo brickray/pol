@@ -5,15 +5,7 @@ namespace pol {
 
 	Quad::Quad(const PropSets& props, Scene& scene)
 		:Shape(props, scene) {
-		if (props.HasValue("world")) {
-			world = props.GetTransform("world");
-		}
-		else {
-			Vector3f t = props.GetVector3f("translate", Vector3f::Zero());
-			Vector3f r = props.GetVector3f("rotate", Vector3f::Zero());
-			Vector3f s = props.GetVector3f("scale", Vector3f::One());
-			world = TRS(t, r, s);
-		}
+		world = GetWorldTransform(props);
 		//precompute normal
 		normal = Normalize(world.TransformNormal(Vector3f::Up()));
 	}

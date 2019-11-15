@@ -9,16 +9,7 @@ namespace pol {
 	POL_REGISTER_CLASS(TriangleMesh, "trianglemesh");
 
 	TriangleMesh::TriangleMesh(const PropSets& props, Scene& scene) {
-		Transform world;
-		if (props.HasValue("world")) {
-			world = props.GetTransform("world");
-		}
-		else {
-			Vector3f t = props.GetVector3f("translate", Vector3f::Zero());
-			Vector3f r = props.GetVector3f("rotate", Vector3f::Zero());
-			Vector3f s = props.GetVector3f("scale", Vector3f::One());
-			world = TRS(t, r, s);
-		}
+		Transform world = GetWorldTransform(props);
 		string am = props.GetString("alphaMask");
 		alphaMask = scene.GetTexture(am);
 		if (props.HasValue("heightfield")) {
@@ -156,10 +147,10 @@ namespace pol {
 		if (tt < ray.tmin || tt > ray.tmax)
 			return false;
 
-		//calculate UV
+		//compute UV
 		Vector2f uv = uv1* (1.f - b1 - b2) + uv2 * b1 + uv3 * b2;
 		Vector3f dpdu, dpdv;
-		//calculate partial differential
+		//compute partial differential
 		//p = pi + dpdu*ui + dpdv*vi
 		//| p2 - p1 |   | u2 - u1  v2 - v1 | | dpdu |
 		//|         | = |                  | |      |
@@ -167,14 +158,14 @@ namespace pol {
 		Vector2f duv1 = uv2 - uv1;
 		Vector2f duv2 = uv3 - uv1;
 		Float det = duv1.x * duv2.y - duv1.y * duv2.x;
-		if (det == 0) {
+		if (fabs(det) < 1e-8) {
 			//degenerate
-			CoordinateSystem(Cross(e1, e2), dpdu, dpdv);
+			CoordinateSystem(Normalize(Cross(e1, e2)), dpdu, dpdv);
 		}
 		else {
 			Float invDet = 1 / det;
-			dpdu = (duv2.y * e1 - duv2.x * e2) * invDet;
-			dpdv = (-duv1.y * e1 + duv1.x * e2) * invDet;
+			dpdu = (duv2.y * e1 - duv1.y * e2) * invDet;
+			dpdv = (-duv2.x * e1 + duv1.x * e2) * invDet;
 		}
 
 		//alpha mask texture exists?
@@ -243,10 +234,10 @@ namespace pol {
 		if (tt < ray.tmin || tt > ray.tmax)
 			return false;
 
-		//calculate UV
+		//compute UV
 		Vector2f uv = uv1 * (1.f - b1 - b2) + uv2 * b1 + uv3 * b2;
 		Vector3f dpdu, dpdv;
-		//calculate partial differential
+		//compute partial differential
 		//p = pi + dpdu*ui + dpdv*vi
 		//| p2 - p1 |   | u2 - u1  v2 - v1 | | dpdu |
 		//|         | = |                  | |      |
@@ -254,14 +245,14 @@ namespace pol {
 		Vector2f duv1 = uv2 - uv1;
 		Vector2f duv2 = uv3 - uv1;
 		Float det = duv1.x * duv2.y - duv1.y * duv2.x;
-		if (det == 0) {
+		if (fabs(det) < 1e-8) {
 			//degenerate
 			CoordinateSystem(Cross(e1, e2), dpdu, dpdv);
 		}
 		else {
 			Float invDet = 1 / det;
-			dpdu = (duv2.y * e1 - duv2.x * e2) * invDet;
-			dpdv = (-duv1.y * e1 + duv1.x * e2) * invDet;
+			dpdu = (duv2.y * e1 - duv1.y * e2) * invDet;
+			dpdv = (-duv2.x * e1 + duv1.x * e2) * invDet;
 		}
 
 		//alpha mask texture exists?

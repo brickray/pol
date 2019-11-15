@@ -10,9 +10,9 @@
 
 namespace pol {
 
-	bool ImageIO::LoadTexture(const char* filename, int& width, int& height, bool srgb, vector<Vector3f>& output) {
+	bool ImageIO::LoadTexture(const char* filename, int& width, int& height, bool srgb, bool flip, vector<Vector3f>& output) {
 		int component;
-		stbi_set_flip_vertically_on_load(false);
+		stbi_set_flip_vertically_on_load(flip);
 		unsigned char* tex = stbi_load(filename, &width, &height, &component, 0);
 		if (tex) {
 			output.resize(width * height);

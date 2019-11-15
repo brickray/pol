@@ -137,18 +137,21 @@ namespace objwriter
 
 namespace pol {
 	void MeshIO::LoadModelFromFile(vector<Vector3f>& p, vector<Vector3f>& n, vector<Vector2f>& uv, vector<int>& indices, string filename, unsigned int flags) {
-#if POL_ASSIMP_LOADER
-		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(filename, flags);
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-			fprintf(stderr, "Error when improt model: %s\n", importer.GetErrorString());
-			exit(1);
-		}
+		int nPos = filename.find_last_of('.');
+		string extension = filename.substr(nPos + 1);
+		if (extension != ".obj") {
+			Assimp::Importer importer;
+			const aiScene* scene = importer.ReadFile(filename, flags);
+			if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+				fprintf(stderr, "Error when improt model: %s\n", importer.GetErrorString());
+				exit(1);
+			}
 
-		processNode(p, n, uv, indices, scene->mRootNode, scene);
-#else
-		loadObj(p, n, uv, indices, filename);
-#endif
+			processNode(p, n, uv, indices, scene->mRootNode, scene);
+		}
+		else {
+			loadObj(p, n, uv, indices, filename);
+		}
 		fprintf(stdout, "Load Model sucessfully: %s\n", filename.c_str());
 		fprintf(stdout, "Merge [%d] triangles\n", indices.size() / 3);
 	}

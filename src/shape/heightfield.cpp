@@ -6,7 +6,7 @@ namespace pol {
 	bool CreateHeightFieldShape(const char* file, TriangleMesh* mesh) {
 		int w, h;
 		vector<Vector3f> height;
-		if (!ImageIO::LoadTexture(file, w, h, false, height)) return false;
+		if (!ImageIO::LoadTexture(file, w, h, false, false, height)) return false;
 		
 		mesh->p.resize(w * h);
 		mesh->n.resize(w * h);

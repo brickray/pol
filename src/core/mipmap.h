@@ -57,6 +57,8 @@ namespace pol {
 		Vector3f Lookup(const Vector2f& uv, Float width = 0) const;
 		Vector3f Lookup(const Intersection& isect) const;
 
+		//debug purpose
+		void WritePyramid(const string& directory) const;
 		string ToString() const;
 
 	private:

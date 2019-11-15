@@ -8,15 +8,7 @@ namespace pol {
 
 	Infinite::Infinite(const PropSets& props, Scene& scene)
 		:Light(props, scene) {
-		if (props.HasValue("world")) {
-			world = props.GetTransform("world");
-		}
-		else {
-			Vector3f t = props.GetVector3f("translate", Vector3f::Zero());
-			Vector3f r = props.GetVector3f("rotate", Vector3f::Zero());
-			Vector3f s = props.GetVector3f("scale", Vector3f::One());
-			world = TRS(t, r, s);
-		}
+		world = GetWorldTransform(props);
 		string file = props.GetString("file");
 		int w, h;
 		vector<Vector3f> data;
