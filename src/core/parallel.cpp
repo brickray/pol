@@ -1,5 +1,6 @@
 #include "parallel.h"
 #include <queue>
+#include <atomic>
 
 //parallel notes from pbrt
 //Cache coherence is a feature of all modern multicore CPUs; with it, memory writes by
@@ -85,22 +86,31 @@
 
 namespace pol {
 	vector<thread*> Parallel::threads;
-	mutex barrier;
+	atomic<int> activeThreads = 0;
+	mutex taskBarrier, reportBarrier;
 	int nTasks;
+	atomic<int> nextTaskId = 0;
 	queue<RenderBlock> tasks;
 	function<void(const RenderBlock & rb)> func;
 	void ThreadEntry(int index) {
 		while (true) {
-			barrier.lock();
+			taskBarrier.lock();
 			if (tasks.empty()) {
-				barrier.unlock();
+				taskBarrier.unlock();
 				continue;
 			}
+			activeThreads++;
 			const RenderBlock& rb = tasks.front();
 			tasks.pop();
-			barrier.unlock();
+			taskBarrier.unlock();
 
 			func(rb);
+
+			reportBarrier.lock();
+			activeThreads--;
+			nextTaskId++;
+			printf("Rendering Progress[%.3f%%]\r", Float(nTasks - 1 - tasks.size()) / (nTasks - 1) * 100);
+			reportBarrier.unlock();
 		}
 
 	}
@@ -121,13 +131,17 @@ namespace pol {
 	}
 
 	void Parallel::ParallelLoop(function<void(const RenderBlock & rb)> f, const vector<RenderBlock>& rbs) {
-		barrier.lock();
+		taskBarrier.lock();
 		nTasks = rbs.size();
 		for (int i = 0; i < nTasks; ++i) {
 			tasks.push(rbs[i]);
 		}
 		func = f;
-		barrier.unlock();
+		taskBarrier.unlock();
+	}
+
+	bool Parallel::IsFinish() {
+		return nextTaskId >= nTasks && activeThreads == 0;
 	}
 
 	int Parallel::GetNumSystemCores() {

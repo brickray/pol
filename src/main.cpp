@@ -94,11 +94,11 @@ Scene VeachMis() {
 
 int main(int argc, char** argv) {
 	Scene scene;
-	if (!Parser::Parse("../scenes/classroom/scene.json", scene)) {
+	if (!Parser::Parse("../scenes/kitchen/scene.json", scene)) {
 		return 1;
 	}
 
-	printf("%s\n", scene.ToString().c_str());
+//	printf("%s\n", scene.ToString().c_str());
 
 	Timer timer;
 	timer.Start();

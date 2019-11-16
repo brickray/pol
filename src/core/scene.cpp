@@ -182,8 +182,6 @@ namespace pol {
 		Sampler* sampler = this->sampler;
 		int sampleCount = sampler->GetSampleCount();
 
-		int nTasks = rbs.size();
-		volatile int task = 0;
 		Parallel::ParallelLoop([&](const RenderBlock& rb) {
 			Sampler* samplerClone = sampler->Clone();
 			int sx = rb.sx, sy = rb.sy;
@@ -205,14 +203,10 @@ namespace pol {
 				}
 			}
 
-			++task;
-
 			delete samplerClone;
 		}, rbs);
 
-		while (task < nTasks) {
-			printf("Rendering Progress[%.3f%%]\r", Float(task) / (nTasks - 1) * 100);
-		}
+		while (!Parallel::IsFinish());
 
 		film->WriteImage();
 	}
