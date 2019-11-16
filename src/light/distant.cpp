@@ -7,7 +7,7 @@ namespace pol {
 	Distant::Distant(const PropSets& props, Scene& scene)
 		:Light(props, scene) {
 		radiance = props.GetVector3f("radiance", Vector3f::Zero());
-		direction = props.GetVector3f("direction", Vector3f::Up());
+		direction = Normalize(props.GetVector3f("direction", Vector3f::Up()));
 	}
 
 	void Distant::Prepare(const Scene& scene) {

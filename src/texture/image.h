@@ -34,7 +34,7 @@ namespace pol {
 			else wmode = WrapMode::E_REPEAT;
 
 			bool flip = props.GetBool("flip", true);
-
+			
 			int w, h;
 			vector<Vector3f> data;
 			ImageIO::LoadTexture(Directory::GetFullPath(file).c_str(), w, h, srgb, flip, data);

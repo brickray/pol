@@ -7,7 +7,7 @@ namespace pol {
 		:Light(props, scene) {
 		radiance = props.GetVector3f("radiance", Vector3f::Zero());
 		position = props.GetVector3f("position", Vector3f::Zero());
-		direction = props.GetVector3f("direction", Vector3f::Up());
+		direction = Normalize(props.GetVector3f("direction", Vector3f::Up()));
 		total = cos(Radians(props.GetFloat("total", 45)));
 		falloff = cos(Radians(props.GetFloat("falloff", 30)));
 	}
