@@ -1,5 +1,6 @@
 #include "film.h"
 #include "imageio.h"
+#include "directory.h"
 
 namespace pol {
 	Film::Film(const string& filename, const Vector2i& res, string tonemap)
@@ -31,13 +32,13 @@ namespace pol {
 			else if (tonemap == "filmic") c = filmic(c);
 		}
 
-		bool success = ImageIO::SavePng(filename.c_str(), res.x, res.y, image);
+		bool success = ImageIO::SavePng(Directory::GetFullPath(filename).c_str(), res.x, res.y, image);
 		
 		return success;
 	}
 
 	Vector3f Film::filmic(const Vector3f& in) const {
-		Vector3f c = in - Vector3f(0.04);
+		Vector3f c = in - Vector3f(0.004);
 		c = Max(c, Vector3f(0.f));
 		c = (c * (Float(6.2) * c + Float(0.5))) / (c * (Float(6.2) * c + Float(1.7)) + Float(0.06));
 	

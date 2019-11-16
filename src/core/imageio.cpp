@@ -9,6 +9,51 @@
 #include <tinyexr\tinyexr.h>
 
 namespace pol {
+	bool ImageIO::LoadAlphaMap(const char* filename, int& width, int& height, vector<Vector3f>& output) {
+		int component;
+		stbi_set_flip_vertically_on_load(false);
+		unsigned char* tex = stbi_load(filename, &width, &height, &component, 0);
+		if (tex) {
+			output.resize(width * height);
+			float inv = 1.f / 255.f;
+			for (int s = 0; s < height; ++s) {
+				for (int t = 0; t < width; ++t) {
+					//flip
+					int idx = s * width + t;
+					//int inverseIdx = (height - s - 1)*width + t;
+
+					Vector3f texel;
+					if (component == 1) {
+						float r = tex[idx] * inv;
+						texel = Vector3f(r, r, r);
+					}
+					else if (component == 3) {
+						float r = tex[3 * idx] * inv;
+						float g = tex[3 * idx + 1] * inv;
+						float b = tex[3 * idx + 2] * inv;
+						texel = Vector3f(r, r, r);
+					}
+					else if (component == 4) {
+						float r = tex[4 * idx] * inv;
+						float g = tex[4 * idx + 1] * inv;
+						float b = tex[4 * idx + 2] * inv;
+						float a = tex[4 * idx + 3] * inv;
+						texel = Vector3f(a, a, a);
+					}
+
+					output[idx] = texel;
+				}
+			}
+
+			stbi_image_free(tex);
+		}
+		else {
+			fprintf(stderr, "Error when load texture [%s]\n", filename);
+			return false;
+		}
+
+		return true;
+	}
 
 	bool ImageIO::LoadTexture(const char* filename, int& width, int& height, bool srgb, bool flip, vector<Vector3f>& output) {
 		int component;
