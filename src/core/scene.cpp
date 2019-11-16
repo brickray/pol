@@ -1,4 +1,6 @@
 #include "scene.h"
+#include "renderblock.h"
+#include "parallel.h"
 
 namespace pol {
 	Scene::Scene() {
@@ -19,6 +21,8 @@ namespace pol {
 		for (BsdfIterator it = bsdfs.begin(); it != bsdfs.end(); ++it) POL_SAFE_DELETE(it->second);
 		for (Shape* shape : primitives) POL_SAFE_DELETE(shape);
 		for (Light* light : lights) POL_SAFE_DELETE(light);
+
+		Parallel::Shutdown();
 	}
 
 	void Scene::SetCamera(Camera* c) {
@@ -131,6 +135,9 @@ namespace pol {
 			//unknown strategy, use spatial method
 			lightDistribution = new SpatialLightDistribution(*this);
 		}
+
+		//init parallel
+		Parallel::Startup();
 	}
 
 	bool Scene::Intersect(Ray& ray, Intersection& isect) const {
@@ -167,27 +174,44 @@ namespace pol {
 	}
 
 	void Scene::Render() const {
+		vector<RenderBlock> rbs;
+		//get render block
+		InitRenderBlock(*this, rbs);
+
 		Film* film = camera->GetFilm();
 		Sampler* sampler = this->sampler;
 		int sampleCount = sampler->GetSampleCount();
 
-		for (int i = 0; i < film->res.x; ++i) {
-			for (int j = 0; j < film->res.y; ++j) {
-				sampler->Prepare(j * film->res.x + i);
-				Vector3f color(0.f);
-				for (int s = 0; s < sampleCount; ++s) {
-					Vector2f offset = sampler->Next2D() - Vector2f(0.5);
-					Vector2f sample = Vector2f(i, j) + offset;
-					RayDifferential ray = camera->GenerateRayDifferential(sample, sampler->Next2D());
-		
-					color += integrator->Li(ray, *this, sampler);
-				}
+		int nTasks = rbs.size();
+		volatile int task = 0;
+		Parallel::ParallelLoop([&](const RenderBlock& rb) {
+			Sampler* samplerClone = sampler->Clone();
+			int sx = rb.sx, sy = rb.sy;
+			int ex = rb.sx + rb.w, ey = rb.sy + rb.h;
+			for (int i = sx; i < ex; ++i) {
+				for (int j = sy; j < ey; ++j) {
+					samplerClone->Prepare(j * film->res.x + i);
+					Vector3f color(0.f);
+					for (int s = 0; s < sampleCount; ++s) {
+						Vector2f offset = samplerClone->Next2D() - Vector2f(0.5);
+						Vector2f sample = Vector2f(i, j) + offset;
+						RayDifferential ray = camera->GenerateRayDifferential(sample, samplerClone->Next2D());
 
-				color /= Float(sampleCount);
-				film->AddPixel(Vector2f(i, j), color);
+						color += integrator->Li(ray, *this, samplerClone);
+					}
+
+					color /= Float(sampleCount);
+					film->AddPixel(Vector2f(i, j), color);
+				}
 			}
 
-			printf("Rendering Progress[%.3f%%]\r", Float(i) / (film->res.x - 1) * 100);
+			++task;
+
+			delete samplerClone;
+		}, rbs);
+
+		while (task < nTasks) {
+			printf("Rendering Progress[%.3f%%]\r", Float(task) / (nTasks - 1) * 100);
 		}
 
 		film->WriteImage();

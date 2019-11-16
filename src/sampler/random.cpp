@@ -20,6 +20,10 @@ namespace pol {
 		return Vector2f(rng.UniformFloat(), rng.UniformFloat());
 	}
 
+	Sampler* Random::Clone() const {
+		return new Random(*this);
+	}
+
 	//return a human-readable string summary
 	string Random::ToString() const {
 		string ret;

@@ -1,15 +1,20 @@
 #pragma once
 
 #include "../pol.h"
+#include "renderblock.h"
 #include <thread>
+#include <functional>
+#include <mutex>
 
 namespace pol {
 	class Parallel {
 	private:
-		vector<thread> threads;
+		static vector<thread*> threads;
 
 	public:
-		static void Init();
+		static void Startup();
+		static void Shutdown();
+		static void ParallelLoop(function<void(const RenderBlock& rb)> func, const vector<RenderBlock>& rbs);
 
 		static int GetNumSystemCores();
 	};

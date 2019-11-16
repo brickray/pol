@@ -13,6 +13,7 @@ namespace pol {
 		virtual void Prepare(uint64_t idx);
 		virtual Float Next1D() const;
 		virtual Vector2f Next2D() const;
+		virtual Sampler* Clone() const;
 
 		virtual string ToString() const;
 	};

@@ -1,4 +1,5 @@
 #include "parallel.h"
+#include <queue>
 
 //parallel notes from pbrt
 //Cache coherence is a feature of all modern multicore CPUs; with it, memory writes by
@@ -83,8 +84,50 @@
 //larger updates.
 
 namespace pol {
-	void Parallel::Init() {
+	vector<thread*> Parallel::threads;
+	mutex barrier;
+	int nTasks;
+	queue<RenderBlock> tasks;
+	function<void(const RenderBlock & rb)> func;
+	void ThreadEntry(int index) {
+		while (true) {
+			barrier.lock();
+			if (tasks.empty()) {
+				barrier.unlock();
+				continue;
+			}
+			const RenderBlock& rb = tasks.front();
+			tasks.pop();
+			barrier.unlock();
 
+			func(rb);
+		}
+
+	}
+
+	void Parallel::Startup() {
+		int nCores = GetNumSystemCores();
+		threads.resize(nCores);
+		for (int i = 0; i < nCores; ++i) {
+			threads[i] = new thread(ThreadEntry, i);
+			threads[i]->detach();
+		}
+	}
+
+	void Parallel::Shutdown() {
+		for (thread* t : threads) {
+			delete t;
+		}
+	}
+
+	void Parallel::ParallelLoop(function<void(const RenderBlock & rb)> f, const vector<RenderBlock>& rbs) {
+		barrier.lock();
+		nTasks = rbs.size();
+		for (int i = 0; i < nTasks; ++i) {
+			tasks.push(rbs[i]);
+		}
+		func = f;
+		barrier.unlock();
 	}
 
 	int Parallel::GetNumSystemCores() {
