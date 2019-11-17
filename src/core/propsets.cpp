@@ -54,8 +54,14 @@ namespace pol {
 	}
 
 	Vector3f PropSets::GetVector3f(const string& name, Vector3f defaultValue) const {
-		if (value->HasMember(name.c_str()))
-			return getVector3f(&(*value)[name.c_str()]);
+		if (value->HasMember(name.c_str())) {
+			const rapidjson::Value& vec = (*value)[name.c_str()];
+			if (!vec.IsArray()) {
+				printf("key %s is not array\n", name.c_str());
+				exit(1);
+			}
+			return getVector3f(&vec);
+		}
 
 		return defaultValue;
 	}
@@ -66,8 +72,14 @@ namespace pol {
 
 	Transform PropSets::GetTransform(const string& name, Transform defaultValue) const {
 		Transform ret = defaultValue;
-		if (value->HasMember(name.c_str()))
-			ret = Transform(getMatrix4(&(*value)[name.c_str()]));
+		if (value->HasMember(name.c_str())) {
+			const rapidjson::Value& trs = (*value)[name.c_str()];
+			if (!trs.IsArray()) {
+				printf("key %s is not array\n", name.c_str());
+				exit(1);
+			}
+			ret = Transform(getMatrix4(&trs));
+		}
 
 		return ret;
 	}
@@ -85,8 +97,8 @@ namespace pol {
 
 	Matrix4 PropSets::getMatrix4(const rapidjson::Value* v) const {
 		Matrix4 ret;
-		rapidjson::Value::ConstValueIterator it = value->Begin();
-		for (int i = 0; it != value->End(); ++it, ++i) {
+		rapidjson::Value::ConstValueIterator it = v->Begin();
+		for (int i = 0; it != v->End(); ++it, ++i) {
 			if (i >= 16) break;
 
 			ret[i / 4][i % 4] = it->GetDouble();

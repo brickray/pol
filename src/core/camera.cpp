@@ -19,7 +19,8 @@ namespace pol {
 		int yRes = props.GetInt("yRes");
 		string tonemap = props.GetString("tonemap", "gamma");
 		string output = props.GetString("output");
-		film = new Film(output, Vector2i(xRes, yRes), tonemap);
+		Float scale = props.GetFloat("scale", 1);
+		film = new Film(output, Vector2i(xRes, yRes), tonemap, scale);
 
 		scene.SetCamera(this);
 	}

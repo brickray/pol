@@ -99,16 +99,16 @@ namespace pol {
 				taskBarrier.unlock();
 				continue;
 			}
-			activeThreads++;
 			const RenderBlock& rb = tasks.front();
 			tasks.pop();
 			taskBarrier.unlock();
+			activeThreads++;
 
 			func(rb);
 
-			reportBarrier.lock();
 			activeThreads--;
 			nextTaskId++;
+			reportBarrier.lock();
 			printf("Rendering Progress[%.3f%%]\r", Float(nTasks - 1 - tasks.size()) / (nTasks - 1) * 100);
 			reportBarrier.unlock();
 		}

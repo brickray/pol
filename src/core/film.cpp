@@ -3,8 +3,8 @@
 #include "directory.h"
 
 namespace pol {
-	Film::Film(const string& filename, const Vector2i& res, string tonemap)
-		:filename(filename), res(res), tonemap(tonemap) {
+	Film::Film(const string& filename, const Vector2i& res, string tonemap, Float scale)
+		:filename(filename), res(res), tonemap(tonemap), scale(scale) {
 		//resize image buffer
 		image.resize(res.x * res.y);
 	}
@@ -28,8 +28,10 @@ namespace pol {
 
 	bool Film::WriteImage() {
 		for (Vector3f& c : image) {
+			c *= scale;
 			if (tonemap == "gamma") c = gamma(c);
 			else if (tonemap == "filmic") c = filmic(c);
+			else c = filmic(c);
 		}
 
 		bool success = ImageIO::SavePng(Directory::GetFullPath(filename).c_str(), res.x, res.y, image);
@@ -55,7 +57,7 @@ namespace pol {
 		return Vector3f(toSRGB(c.X()), toSRGB(c.Y()), toSRGB(c.Z()));
 	}
 
-	Film* CreateFilm(const string& filename, const Vector2i& res, string tonemap) {
-		return new Film(filename, res, tonemap);
+	Film* CreateFilm(const string& filename, const Vector2i& res, string tonemap, Float scale) {
+		return new Film(filename, res, tonemap, scale);
 	}
 }

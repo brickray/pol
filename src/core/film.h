@@ -13,9 +13,10 @@ namespace pol {
 		string tonemap;
 		//image data
 		vector<Vector3f> image;
+		Float scale;
 
 	public:
-		Film(const string& filename, const Vector2i& res, string tonemap);
+		Film(const string& filename, const Vector2i& res, string tonemap, Float scale);
 		~Film();
 
 		void AddPixel(int p, const Vector3f& c);
@@ -27,5 +28,5 @@ namespace pol {
 		Vector3f gamma(const Vector3f& c) const;
 	};
 
-	Film* CreateFilm(const string& filename, const Vector2i& res, string tonemap = "gamma");
+	Film* CreateFilm(const string& filename, const Vector2i& res, string tonemap = "gamma", Float scale = 1);
 }
