@@ -1,5 +1,6 @@
 #include "distant.h"
 #include "../core/scene.h"
+#include "../core/warp.h"
 
 namespace pol {
 	POL_REGISTER_CLASS(Distant, "distant");
@@ -37,6 +38,20 @@ namespace pol {
 		rad = radiance;
 		pdf = 1;
 		shadowRay = Ray(isect.p, -direction);
+	}
+
+	void Distant::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Ray& emitRay, Float& pdfW, Float& pdfA) const {
+		Vector2f uv = Warp::ConcentricDisk(posSample) * radius;
+		Vector3f pos = Vector3f(uv.x, 0, uv.y);
+		Frame frame(direction);
+		pos = frame.ToWorld(pos);
+		pos += center;
+		pos -= direction * radius;
+
+		rad = radiance;
+		emitRay = Ray(pos, direction);
+		pdfA = 1 / (PI * radius * radius);
+		pdfW = 1;
 	}
 
 	Float Distant::Pdf(const Intersection& isect, const Vector3f& pOnSurface) const {

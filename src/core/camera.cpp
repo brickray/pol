@@ -36,17 +36,17 @@ namespace pol {
 
 	ProjectionCamera::ProjectionCamera(const PropSets& props, Scene& scene)
 		:Camera(props, scene) {
-		if (props.HasValue("projection")) {
-			projection = props.GetTransform("projection");
-		}
-		else {
-			Float fov = props.GetFloat("fov", 60);
-			int xRes = props.GetInt("xRes", 512);
-			int yRes = props.GetInt("yRes", 512);
-			Float near = props.GetFloat("near", 0.1);
-			Float far = props.GetFloat("far", 100);
-			projection = Perspective(fov, Float(xRes) / yRes, near, far);
-		}
+		Float fov = props.GetFloat("fov", 60);
+		int xRes = props.GetInt("xRes", 512);
+		int yRes = props.GetInt("yRes", 512);
+		Float near = props.GetFloat("near", 0.1);
+		Float far = props.GetFloat("far", 100);
+		projection = Perspective(fov, Float(xRes) / yRes, near, far);
+
+		//compute sensor area
+		Float height = tan(Radians(fov * 0.5)) * near;
+		Float width = height * Float(xRes) / yRes;
+		area = 4 * width * height;
 	}
 
 	ProjectionCamera::~ProjectionCamera() {

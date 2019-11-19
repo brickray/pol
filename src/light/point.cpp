@@ -1,4 +1,5 @@
 #include "point.h"
+#include "../core/warp.h"
 
 namespace pol {
 	POL_REGISTER_CLASS(Point, "point");
@@ -35,6 +36,15 @@ namespace pol {
 		pdf = lensq;
 		rad = radiance;
 		shadowRay = Ray(isect.p, Normalize(dir), Epsilon, len - Epsilon);
+	}
+
+    void Point::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Ray& emitRay, Float& pdfW, Float& pdfA) const {
+		Vector3f dir = Warp::UniformSphere(dirSample);
+
+		rad = radiance;
+		emitRay = Ray(position, dir);
+		pdfA = 1;
+		pdfW = Warp::UniformSpherePdf(dir);
 	}
 
 	Float Point::Pdf(const Intersection& isect, const Vector3f& pOnSurface) const {

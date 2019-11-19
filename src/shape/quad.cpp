@@ -97,6 +97,13 @@ namespace pol {
 		solidAngle = false;
 	}
 
+	void Quad::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdfA) const {
+		pos = Vector3f(2 * u.x - 1, 0, 2 * u.y - 1);
+		pos = world.TransformPoint(pos);
+		nor = normal;
+		pdfA = 1 / SurfaceArea();
+	}
+
 	Float Quad::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface, bool& solidAngle) const {
 		solidAngle = false;
 		return 1 / SurfaceArea();

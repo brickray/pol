@@ -1,4 +1,5 @@
 #include "area.h"
+#include "../core/warp.h"
 
 namespace pol {
 	POL_REGISTER_CLASS(Area, "area");
@@ -52,6 +53,18 @@ namespace pol {
 		rad = radiance;
 		if(!solidAngle) pdf *= (lensq / fabs(Dot(dir, nor)));
 		shadowRay = Ray(isect.p, dir, Epsilon, len - Epsilon);
+	}
+
+	void Area::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Ray& emitRay, Float& pdfW, Float& pdfA) const {
+		Vector3f pos, nor;
+		shape->SampleShape(posSample, pos, nor, pdfA);
+		Vector3f dir = Warp::CosineHemiSphere(dirSample);
+		pdfW = Warp::CosineHemiSpherePdf(dir);
+		Frame frame(nor);
+		dir = frame.ToWorld(dir);
+
+		rad = radiance;
+		emitRay = Ray(pos, dir);
 	}
 
 	Float Area::Pdf(const Intersection& isect, const Vector3f& pOnSurface) const {

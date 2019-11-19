@@ -28,6 +28,7 @@ namespace pol {
 		//sample shape
 		//soldAngle : pdf in which type (area or solidAngle)
 		virtual void SampleShape(const Vector2f& u, /*in out*/Vector3f& pos, Vector3f& nor, Float& pdf, bool& solidAngle) const = 0;
+		virtual void SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdfA) const;
 		//soldAngle : pdf in which type (area or solidAngle)
 		virtual Float Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface, bool& solidAngle) const = 0;
 

@@ -18,6 +18,7 @@ namespace pol {
 		virtual bool IsInfinite() const;
 		virtual Float Luminance() const;
 		virtual void SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const;
+		virtual void SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Ray& emitRay, Float& pdfW, Float& pdfA) const;
 
 		virtual Vector3f Le(const Vector3f& in, const Vector3f& nor) const;
 

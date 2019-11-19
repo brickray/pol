@@ -1,4 +1,5 @@
 #include "spot.h"
+#include "../core/warp.h"
 
 namespace pol {
 	POL_REGISTER_CLASS(Spot, "spot");
@@ -44,6 +45,17 @@ namespace pol {
 		rad = radiance * attenuation;
 		pdf = lensq;
 		shadowRay = Ray(isect.p, dir, Epsilon, len - Epsilon);
+	}
+
+	void Spot::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Ray& emitRay, Float& pdfW, Float& pdfA) const {
+		Vector3f dir = Warp::UniformCone(dirSample, total);
+		Frame frame(direction);
+		dir = frame.ToWorld(dir);
+
+		rad = radiance;
+		emitRay = Ray(position, dir);
+		pdfA = 1;
+		pdfW = Warp::UniformConePdf(total);
 	}
 
 	Float Spot::Pdf(const Intersection& isect, const Vector3f& pOnSurface) const {

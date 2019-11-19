@@ -101,6 +101,14 @@ namespace pol {
 		solidAngle = false;
 	}
 
+	void Disk::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdfA) const {
+		Vector2f p = Warp::ConcentricDisk(u);
+		pos = Vector3f(p.x * radius, 0, p.y * radius);
+		pos = world.TransformPoint(pos);
+		nor = normal;
+		pdfA = 1 / SurfaceArea();
+	}
+
 	Float Disk::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface, bool& solidAngle) const {
 		solidAngle = false;
 		return 1 / SurfaceArea();

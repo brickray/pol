@@ -289,6 +289,23 @@ namespace pol {
 		solidAngle = false;
 	}
 
+	void Triangle::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdfA) const {
+		int idx1 = mesh->indices[faceIndex + 0];
+		int idx2 = mesh->indices[faceIndex + 1];
+		int idx3 = mesh->indices[faceIndex + 2];
+		Vector3f v1 = mesh->p[idx1];
+		Vector3f v2 = mesh->p[idx2];
+		Vector3f v3 = mesh->p[idx3];
+		Vector3f n1 = mesh->n[idx1];
+		Vector3f n2 = mesh->n[idx2];
+		Vector3f n3 = mesh->n[idx3];
+
+		Vector2f uv = Warp::UniformTriangle(u);
+		pos = v1 * (1 - uv.x - uv.y) + v2 * uv.x + v3 * uv.y;
+		nor = n1 * (1 - uv.x - uv.y) + n2 * uv.y + n3 * uv.y;
+		pdfA = 1 / SurfaceArea();
+	}
+
 	Float Triangle::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface, bool& solidAngle) const {
 		solidAngle = false;
 		return 1 / SurfaceArea();

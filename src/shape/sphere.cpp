@@ -153,6 +153,16 @@ namespace pol {
 		solidAngle = true;
 	}
 
+	void Sphere::SampleShape(const Vector2f& u, Vector3f& pos, Vector3f& nor, Float& pdfA) const {
+		Vector3f center;
+		world.ExtractTranslation(center);
+
+		pos = Warp::UniformSphere(u);
+		nor = pos;
+		pos *= radius; pos += center;
+		pdfA = 1 / SurfaceArea();
+	}
+
 	Float Sphere::Pdf(const Vector3f& pOnLight, const Vector3f& pOnSurface, bool& solidAngle) const {
 		Vector3f center;
 		world.ExtractTranslation(center);

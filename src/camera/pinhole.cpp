@@ -64,6 +64,32 @@ namespace pol {
 		return ray;
 	}
 
+	void Pinhole::SampleWe(const Vector3f& pos, Vector3f& we, Ray& shadowRay, Float& pdf, Vector2i& pRaster) const {
+		//transform pos to camera space
+		Vector3f pCamera = view.TransformPoint(pos);
+		Vector3f dir = pCamera;
+		Vector3f ndir = Normalize(dir);
+		shadowRay = Ray(Vector3f::Zero(), ndir, Epsilon, dir.Length() - Epsilon);
+		shadowRay = view.TransformRay(shadowRay);
+
+		Vector3f pNDC = projection.TransformPoint(ndir);
+		if (pNDC.X() < -1 || pNDC.X() > 1 ||
+			pNDC.Y() < -1 || pNDC.Y() > 1) {
+			//ray can not hit the sensor plane
+			//no contribution
+			pdf = 0;
+			return;
+		}
+
+		Float costheta = Dot(ndir, Vector3f(0, 0, -1));
+		we = 1 / (area * costheta);
+		pdf = 1 / area;
+	}
+
+	Float Pinhole::PdfWe() const {
+
+	}
+
 	string Pinhole::ToString() const {
 		string ret;
 		ret += "PinholeCamera[\n  view = " + indent(view.ToString())
