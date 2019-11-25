@@ -88,7 +88,7 @@ namespace pol {
 
 	string OrenNayar::ToString() const {
 		string ret;
-		ret += "OrenNayar[\n  diffuse = " + indent(diffuse->ToString()),
+		ret += "OrenNayar[\n  diffuse = " + indent(diffuse->ToString())
 			+ ",\n  sigma = " + to_string(sigma)
 			+ "\n]";
 
