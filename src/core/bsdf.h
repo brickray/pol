@@ -144,6 +144,16 @@ namespace pol {
 		}
 		else {
 			//anisotropic
+			Float phi;
+			if (u.y <= 0.25) phi = atan(alphaY / alphaX * tan(TWOPI * u.y));
+			else if (u.y >= 0.75f) phi = atan(alphaY / alphaX * tan(TWOPI * u.y)) + TWOPI;
+			else phi = atan(alphaY / alphaX * tan(TWOPI * u.y)) + PI;
+			Float sinphi = sin(phi);
+			Float sinphi2 = sinphi * sinphi;
+			Float cosphi2 = 1.0f - sinphi2;
+			Float inverseA = 1.0f / (cosphi2 / (alphaX * alphaX) + sinphi2 / (alphaY * alphaY));
+			Float theta = atan(sqrt(inverseA * u.x / (1.0f - u.x)));
+			return SphericalCoordinate(theta, phi);
 		}
 	}
 

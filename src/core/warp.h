@@ -41,5 +41,14 @@ namespace pol {
 		//return pdf of ConcentricDisk() in solid angle
 		static Float ConcentricDiskPdf(const Vector2f& p);
 		static Vector2f UniformTriangle(const Vector2f& u);
+
+		static Vector2f GaussianDisk(const Vector2f& u, Float falloff);
+		static Float GaussianDiskPdf(const Vector3f& center, const Vector3f& sample, const Vector3f& n, Float falloff);
+		static Float GaussianDiskPdf(Float x, Float y, Float falloff);
+		static Vector2f GaussianDisk(const Vector2f& u, Float falloff, Float rMax);
+		static Float GaussianDiskPdf(const Vector3f& center, const Vector3f& sample, const Vector3f& n, Float falloff, Float rMax);
+		static Float GaussianDiskPdf(Float x, Float y, Float falloff, Float rMax);
+		static Float ExponentialDistance(Float u, Float falloff);
+		static Float ExponentialDistancePdf(Float x, Float falloff);
 	};
 }

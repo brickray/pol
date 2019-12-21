@@ -152,7 +152,8 @@ namespace pol {
 			}
 		}
 
-		isect.geoFrame = Frame(isect.n);
+		Vector3f dpdu = Normalize(isect.dpdu);
+		isect.geoFrame = Frame(dpdu, isect.n, Cross(isect.n, dpdu));
 		isect.shFrame = isect.geoFrame;
 
 		return intersect;

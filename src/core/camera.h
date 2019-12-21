@@ -21,8 +21,8 @@ namespace pol {
 		//generate ray differential, mainly for texture anti-aliasing
 		virtual RayDifferential GenerateRayDifferential(const Vector2f& cameraSample, const Vector2f& dofSample) const = 0;
 
-		virtual void SampleWe(const Vector3f& pos, Vector3f& we, Ray& shadowRay, Float& pdf, Vector2i& pRaster) const;
-		virtual Float PdfWe() const;
+		virtual void SampleWe(const Vector3f& pos, Vector3f& we, Ray& shadowRay, Float& pdf, Vector2i& pRaster) const = 0;
+		virtual void PdfWe(Float& pdfA, Float& pdfW) const = 0;
 
 		Film* GetFilm() const;
 	};

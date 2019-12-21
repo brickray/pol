@@ -111,4 +111,40 @@ namespace pol {
 
 		return Vector2f(1.0 - su0, u.y * su0);
 	}
+
+	Vector2f Warp::GaussianDisk(const Vector2f& u, Float falloff) {
+		Float r = sqrt(-log(u.x) / falloff);
+		Float theta = TWOPI * u.y;
+		return Vector2f(r * cos(theta), r * sin(theta));
+	}
+
+	Float Warp::GaussianDiskPdf(const Vector3f& center, const Vector3f& sample, const Vector3f& n, Float falloff) {
+		
+	}
+
+	Float Warp::GaussianDiskPdf(Float x, Float y, Float falloff) {
+		return INVPI * falloff * exp(-falloff * (x * x + y * y));
+	}
+
+	Vector2f Warp::GaussianDisk(const Vector2f& u, Float falloff, Float rMax) {
+		Float r = sqrt(log(1 - u.x * (1 - exp(-falloff * rMax * rMax))) / -falloff);
+		Float theta = TWOPI * u.y;
+		return Vector2f(r * cos(theta), r * sin(theta));
+	}
+
+	Float Warp::GaussianDiskPdf(const Vector3f& center, const Vector3f& sample, const Vector3f& n, Float falloff, Float rMax) {
+
+	}
+
+	Float Warp::GaussianDiskPdf(Float x, Float y, Float falloff, Float rMax) {
+		return GaussianDiskPdf(x, y, falloff) / (1 - exp(-falloff * rMax * rMax));
+	}
+
+	Float Warp::ExponentialDistance(Float u, Float falloff) {
+		return -log(u) / falloff;
+	}
+
+	Float Warp::ExponentialDistancePdf(Float x, Float falloff) {
+		return falloff * exp(-falloff * x);
+	}
 }
