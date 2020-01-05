@@ -3,6 +3,7 @@
 #include "object.h"
 #include "intersection.h"
 #include "bsdf.h"
+#include "bssrdf.h"
 
 namespace pol {
 	class Light;
@@ -11,6 +12,7 @@ namespace pol {
 	protected:
 		//material of shape
 		Bsdf* bsdf;
+		Bssrdf* bssrdf;
 		//light pointer
 		Light* light;
 

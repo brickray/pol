@@ -5,10 +5,11 @@
 
 namespace pol {
 	class Scene;
+	class Sampler;
 	class Bssrdf {
 	public:
 		virtual Vector3f SampleS(const Scene& scene, Float u1, const Vector2f& u2, Float& pdf) const = 0;
-		virtual Vector3f EvaluateSubsurface(const Scene& scene, Float u1, const Vector2f& u2) const;
+		virtual Vector3f EvaluateSubsurface(const Scene& scene, Float u1, const Vector2f& u2) const = 0;
 	};
 
 	class JensenBssrdf : public Bssrdf {
@@ -20,7 +21,7 @@ namespace pol {
 	public:
 		JensenBssrdf(const Vector3f& absorb, const Vector3f& scatter, Float eta, Float g);
 
-		virtual Vector3f SampleS(const Scene& scene, Float u1, const Vector2f& u2, Float& pdf) const;
+		virtual Vector3f SampleS(const Scene& scene, Float u1, const Vector2f& u2, Float& pdf) const { return 0; };
 
 	private:
 		Vector3f rd(Float d2) const;

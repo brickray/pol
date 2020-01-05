@@ -117,11 +117,6 @@ namespace pol {
 		Float theta = TWOPI * u.y;
 		return Vector2f(r * cos(theta), r * sin(theta));
 	}
-
-	Float Warp::GaussianDiskPdf(const Vector3f& center, const Vector3f& sample, const Vector3f& n, Float falloff) {
-		
-	}
-
 	Float Warp::GaussianDiskPdf(Float x, Float y, Float falloff) {
 		return INVPI * falloff * exp(-falloff * (x * x + y * y));
 	}
@@ -130,10 +125,6 @@ namespace pol {
 		Float r = sqrt(log(1 - u.x * (1 - exp(-falloff * rMax * rMax))) / -falloff);
 		Float theta = TWOPI * u.y;
 		return Vector2f(r * cos(theta), r * sin(theta));
-	}
-
-	Float Warp::GaussianDiskPdf(const Vector3f& center, const Vector3f& sample, const Vector3f& n, Float falloff, Float rMax) {
-
 	}
 
 	Float Warp::GaussianDiskPdf(Float x, Float y, Float falloff, Float rMax) {

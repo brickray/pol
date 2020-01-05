@@ -6,6 +6,7 @@
 
 namespace pol {
 	class Bsdf;
+	class Bssrdf;
 	class Light;
 	class Intersection {
 	public:
@@ -21,6 +22,8 @@ namespace pol {
 		Float dvdx, dvdy;
 		//bsdf of intersect
 		Bsdf* bsdf;
+		//bssrdf of intersect
+		Bssrdf* bssrdf;
 		//intersect shape is light?
 		Light* light;
 		//shading frame
@@ -30,7 +33,7 @@ namespace pol {
 
 	public:
 		Intersection()
-			:bsdf(nullptr), light(nullptr)
+			:bsdf(nullptr), bssrdf(nullptr), light(nullptr)
 			, dudx(0), dudy(0)
 			, dvdx(0), dvdy(0) {
 

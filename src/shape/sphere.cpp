@@ -98,6 +98,7 @@ namespace pol {
 		isect.dpdu = Vector3f(dxdu, dydu, dzdu);
 		isect.dpdv = Vector3f(dxdv, dydv, dzdv);
 		isect.bsdf = const_cast<Bsdf*>(bsdf);
+		isect.bssrdf = bssrdf;
 		isect.light = light;
 		//transform the Intersection
 		isect(world);

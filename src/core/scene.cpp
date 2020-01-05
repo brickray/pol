@@ -152,9 +152,15 @@ namespace pol {
 			}
 		}
 
-		Vector3f dpdu = Normalize(isect.dpdu);
-		isect.geoFrame = Frame(dpdu, isect.n, Cross(isect.n, dpdu));
-		isect.shFrame = isect.geoFrame;
+		if (isect.dpdu == Vector3f::Zero() || isect.dpdv == Vector3f::Zero()) {
+			isect.geoFrame = Frame(isect.n);
+			isect.shFrame = isect.geoFrame;
+		}
+		else {
+			Vector3f dpdu = Normalize(isect.dpdu);
+			isect.geoFrame = Frame(dpdu, isect.n, Cross(isect.n, dpdu));
+			isect.shFrame = isect.geoFrame;
+		}
 
 		return intersect;
 	}

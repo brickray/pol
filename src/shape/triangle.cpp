@@ -187,6 +187,7 @@ namespace pol {
 		isect.dpdu = dpdu;
 		isect.dpdv = dpdv;
 		isect.bsdf = bsdf;
+		isect.bssrdf = bssrdf;
 		isect.light = light;
 
 		//finally, set tmax
