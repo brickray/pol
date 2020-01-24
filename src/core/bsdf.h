@@ -114,12 +114,12 @@ namespace pol {
 		Float sinTheta2 = Clamp(1 - cosTheta2, Float(0), Float(1));
 		Float tanTheta2 = sinTheta2 / cosTheta2;
 		if (isinf(tanTheta2)) return 0;
-		/*if (alphaX == alphaY) {
+		if (alphaX == alphaY) {
 			//isotropic
 			Float sqrD = 1 + alphaX * alphaX * tanTheta2;
 			return 2 / (1 + sqrt(sqrD));
 		}
-		else*/ {
+		else {
 			//anisotropic
 			Float sqrD = 1 + tanTheta2 * (cosTheta2 * alphaX * alphaX + sinTheta2 * alphaY * alphaY);
 			return 2 / (1 + sqrt(sqrD));
@@ -157,8 +157,36 @@ namespace pol {
 		}
 	}
 
+	__forceinline Vector3f SampleWhVNDF(const Vector3f& in, const Vector2f& u, Float alphaX, Float alphaY) {
+		//stretch view
+		Vector3f V = Normalize(Vector3f(alphaX * in.X(), in.Y(), alphaY * in.Z()));
+		
+		//orthonormal basis
+		Float lensq = V.X() * V.X() + V.Y() * V.Y();
+		Vector3f T1 = lensq > 0 ? Vector3f(-V.Y(), V.X(), 0) / sqrt(lensq) : Vector3f::Right();
+		Vector3f T2 = Cross(V, T1);
+
+		////sample point with polar coordinates (r, phi)
+		Float r = sqrt(u.x);
+		Float phi = TWOPI * u.y;
+		Float P1 = r * cos(phi);
+		Float P2 = r * sin(phi);
+		Float s = 0.5 * (1 + V.Y());
+		P2 = (1 - s) * sqrt(1 - P1 * P1) + s * P2;
+
+		Vector3f N = P1 * T1 + P2 * T2 + sqrt(Max(0.0, 1.0 - P1 * P1 - P2 * P2)) * V;
+
+		return Normalize(Vector3f(alphaX * N.X(), Max(Float(0), N.Y()), alphaY * N.Z()));
+	}
+
 	//pdf 
 	__forceinline Float PdfWh(const Vector3f& wh, Float alphaX, Float alphaY) {
 		return GGXD(wh, alphaX, alphaY) * Frame::AbsCosTheta(wh);
+	}
+
+	__forceinline Float PdfWhVNDF(const Vector3f& in, const Vector3f& wh, Float alphaX, Float alphaY) {
+		Float D = GGXD(wh, alphaX, alphaY);
+		Float G1 = GGXG1(in, alphaX, alphaY);
+		return G1 * D * abs(Dot(in, wh)) / Frame::AbsCosTheta(in);
 	}
 }
