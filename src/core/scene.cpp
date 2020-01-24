@@ -158,7 +158,9 @@ namespace pol {
 		}
 		else {
 			Vector3f dpdu = Normalize(isect.dpdu);
-			isect.geoFrame = Frame(dpdu, isect.n, Cross(isect.n, dpdu));
+			Vector3f dpdv = Normalize(Cross(dpdu, isect.n));
+			dpdu = Cross(isect.n, dpdv);
+			isect.geoFrame = Frame(dpdu, isect.n, dpdv);
 			isect.shFrame = isect.geoFrame;
 		}
 
