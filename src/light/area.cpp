@@ -55,8 +55,8 @@ namespace pol {
 		shadowRay = Ray(isect.p, dir, Epsilon, len - Epsilon);
 	}
 
-	void Area::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Ray& emitRay, Float& pdfW, Float& pdfA) const {
-		Vector3f pos, nor;
+	void Area::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Vector3f& nor, Ray& emitRay, Float& pdfW, Float& pdfA) const {
+		Vector3f pos;
 		shape->SampleShape(posSample, pos, nor, pdfA);
 		Vector3f dir = Warp::CosineHemiSphere(dirSample);
 		pdfW = Warp::CosineHemiSpherePdf(dir);

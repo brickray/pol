@@ -27,7 +27,7 @@ namespace pol {
 		//¦Õ = ¡ÒLi*cos(t)*dw*dA
 		virtual Float Luminance() const = 0;
 		virtual void SampleLight(const Intersection& isect, const Vector2f& u, Vector3f& rad, Float& pdf, Ray& shadowRay) const = 0;
-		virtual void SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Ray& emitRay, Float& pdfW, Float& pdfA) const = 0;
+		virtual void SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Vector3f& nor, Ray& emitRay, Float& pdfW, Float& pdfA) const = 0;
 
 		virtual Float Pdf(const Intersection& isect, const Vector3f& pOnSurface) const = 0;
 

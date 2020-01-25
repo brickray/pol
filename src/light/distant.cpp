@@ -40,7 +40,7 @@ namespace pol {
 		shadowRay = Ray(isect.p, -direction);
 	}
 
-	void Distant::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Ray& emitRay, Float& pdfW, Float& pdfA) const {
+	void Distant::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Vector3f& nor, Ray& emitRay, Float& pdfW, Float& pdfA) const {
 		Vector2f uv = Warp::ConcentricDisk(posSample) * radius;
 		Vector3f pos = Vector3f(uv.x, 0, uv.y);
 		Frame frame(direction);
@@ -49,6 +49,7 @@ namespace pol {
 		pos -= direction * radius;
 
 		rad = radiance;
+		nor = direction;
 		emitRay = Ray(pos, direction);
 		pdfA = 1 / (PI * radius * radius);
 		pdfW = 1;

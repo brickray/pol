@@ -83,6 +83,10 @@ namespace pol {
 		shadowRay = Ray(isect.p, dir);
 	}
 
+	void Infinite::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Vector3f& nor, Ray& emitRay, Float& pdfA, Float& pdfW) const {
+
+	}
+
 	Float Infinite::Pdf(const Intersection& isect, const Vector3f& pOnSurface) const {
 		Vector3f dir = Normalize(isect.p - pOnSurface);
 		dir = world.TransformVectorInverse(dir);

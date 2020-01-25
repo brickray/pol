@@ -38,10 +38,11 @@ namespace pol {
 		shadowRay = Ray(isect.p, Normalize(dir), Epsilon, len - Epsilon);
 	}
 
-    void Point::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Ray& emitRay, Float& pdfW, Float& pdfA) const {
+    void Point::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Vector3f& nor, Ray& emitRay, Float& pdfW, Float& pdfA) const {
 		Vector3f dir = Warp::UniformSphere(dirSample);
 
 		rad = radiance;
+		nor = dir;
 		emitRay = Ray(position, dir);
 		pdfA = 1;
 		pdfW = Warp::UniformSpherePdf(dir);
