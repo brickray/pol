@@ -125,7 +125,8 @@ namespace pol {
 		if(lightStrategy == "uniform" || lights.size() == 1){
 			lightDistribution = new UniformLightDistribution(*this);
 		}
-		else if (lightStrategy == "power") {
+		else if (lightStrategy == "power" || integrator->IsBidirectional()) {
+			//bidirectional methods using power distribution by default
 			lightDistribution = new PowerLightDistribution(*this);
 		}
 		else if (lightStrategy == "spatial") {
@@ -183,41 +184,45 @@ namespace pol {
 	}
 
 	void Scene::Render() const {
-		vector<RenderBlock> rbs;
-		//get render block
-		InitRenderBlock(*this, rbs);
-
 		Film* film = camera->GetFilm();
 		Sampler* sampler = this->sampler;
 		int sampleCount = sampler->GetSampleCount();
 
-		Parallel::ParallelLoop([&](const RenderBlock& rb) {
-			Sampler* samplerClone = sampler->Clone();
-			int sx = rb.sx, sy = rb.sy;
-			int ex = rb.sx + rb.w, ey = rb.sy + rb.h;
-			for (int i = sx; i < ex; ++i) {
-				for (int j = sy; j < ey; ++j) {
-					samplerClone->Prepare(j * film->res.x + i);
-					Vector3f color(0.f);
-					for (int s = 0; s < sampleCount; ++s) {
-						Vector2f offset = samplerClone->Next2D() - Vector2f(0.5);
-						Vector2f sample = Vector2f(i, j) + offset;
-						RayDifferential ray = camera->GenerateRayDifferential(sample, samplerClone->Next2D());
+		if (!integrator->IsBidirectional()) {
+			vector<RenderBlock> rbs;
+			//get render block
+			InitRenderBlock(*this, rbs);
 
-						color += integrator->Li(ray, *this, samplerClone);
+			Parallel::ParallelLoop([&](const RenderBlock& rb) {
+				Sampler* samplerClone = sampler->Clone();
+				int sx = rb.sx, sy = rb.sy;
+				int ex = rb.sx + rb.w, ey = rb.sy + rb.h;
+				for (int i = sx; i < ex; ++i) {
+					for (int j = sy; j < ey; ++j) {
+						samplerClone->Prepare(j * film->res.x + i);
+						Vector3f color(0.f);
+						for (int s = 0; s < sampleCount; ++s) {
+							Vector2f offset = samplerClone->Next2D() - Vector2f(0.5);
+							Vector2f sample = Vector2f(i, j) + offset;
+							RayDifferential ray = camera->GenerateRayDifferential(sample, samplerClone->Next2D());
+
+							color += integrator->Li(ray, *this, samplerClone);
+						}
+
+						film->AddPixel(Vector2f(i, j), color);
 					}
-
-					color /= Float(sampleCount);
-					film->AddPixel(Vector2f(i, j), color);
 				}
-			}
 
-			delete samplerClone;
-		}, rbs);
+				delete samplerClone;
+				}, rbs);
 
-		while (!Parallel::IsFinish());
+			while (!Parallel::IsFinish());
+		}
+		else {
+			integrator->Render(*this);
+		}
 
-		film->WriteImage();
+		film->WriteImage(Float(1) / sampleCount);
 	}
 
 	//return a brief string summary of the instance(for debugging purposes)

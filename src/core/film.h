@@ -21,7 +21,9 @@ namespace pol {
 
 		void AddPixel(int p, const Vector3f& c);
 		void AddPixel(const Vector2i& p, const Vector3f& c);
-		bool WriteImage();
+		void AddSample(int p, const Vector3f& c);
+		void AddSample(const Vector2i& p, const Vector3f& c);
+		bool WriteImage(Float weight);
 
 	private:
 		Vector3f filmic(const Vector3f& c) const;

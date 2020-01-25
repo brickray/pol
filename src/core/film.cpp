@@ -26,9 +26,22 @@ namespace pol {
 		image[pix] = c;
 	}
 
-	bool Film::WriteImage() {
+	void Film::AddSample(int p, const Vector3f& c) {
+		POL_ASSERT(p < res.x * res.y);
+
+		image[p] += c;
+	}
+
+	void Film::AddSample(const Vector2i& p, const Vector3f& c) {
+		POL_ASSERT(p.x < res.x && p.y < res.y);
+
+		int pix = p.y * res.x + p.x;
+		image[pix] += c;
+	}
+
+	bool Film::WriteImage(Float weight) {
 		for (Vector3f& c : image) {
-			c *= scale;
+			c *= scale * weight;
 			if (tonemap == "gamma") c = gamma(c);
 			else if (tonemap == "filmic") c = filmic(c);
 			else c = filmic(c);

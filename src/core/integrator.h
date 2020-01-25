@@ -52,5 +52,8 @@ namespace pol {
 		virtual ~Integrator();
 
 		virtual Vector3f Li(const RayDifferential& ray, const Scene& scene, const Sampler* sampler) const = 0;
+		//for bidirectional method
+		virtual void Render(const Scene& scene) const {};
+		virtual bool IsBidirectional() const { return false; }
 	};
 }
