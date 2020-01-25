@@ -144,6 +144,10 @@ namespace pol {
 		return nextTaskId >= nTasks && activeThreads == 0;
 	}
 
+	void Parallel::WaitUntilTaskFinish() {
+		while (!Parallel::IsFinish());
+	}
+
 	int Parallel::GetNumSystemCores() {
 		return thread::hardware_concurrency();
 	}

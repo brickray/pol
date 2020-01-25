@@ -111,8 +111,6 @@ namespace pol {
 			}
 
 			}, rbs);
-
-		while (!Parallel::IsFinish());
 	}
 
 	string LTrace::ToString() const {

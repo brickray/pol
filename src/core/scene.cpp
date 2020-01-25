@@ -215,12 +215,12 @@ namespace pol {
 
 				delete samplerClone;
 				}, rbs);
-
-			while (!Parallel::IsFinish());
 		}
 		else {
 			integrator->Render(*this);
 		}
+		
+		while (!Parallel::IsFinish());
 
 		film->WriteImage(Float(1) / sampleCount);
 	}

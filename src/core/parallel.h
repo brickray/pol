@@ -16,6 +16,7 @@ namespace pol {
 		static void Shutdown();
 		static void ParallelLoop(function<void(const RenderBlock& rb)> func, const vector<RenderBlock>& rbs);
 		static bool IsFinish();
+		static void WaitUntilTaskFinish();
 
 		static int GetNumSystemCores();
 	};
