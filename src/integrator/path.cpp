@@ -8,7 +8,7 @@ namespace pol {
 		:Integrator(props, scene) {
 		maxDepth = props.GetInt("maxDepth", 65536);
 		if (maxDepth == -1) maxDepth = 65536;
-		rrDepth = props.GetInt("rrDepth", 5);
+		rrDepth = props.GetInt("rrDepth", 3);
 	}
 
 	//path integrator is aimed to solve equation 

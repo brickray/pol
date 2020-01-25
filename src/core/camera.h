@@ -22,7 +22,7 @@ namespace pol {
 		virtual RayDifferential GenerateRayDifferential(const Vector2f& cameraSample, const Vector2f& dofSample) const = 0;
 
 		virtual void SampleWe(const Vector3f& pos, Vector3f& we, Ray& shadowRay, Float& pdf, Vector2i& pRaster) const = 0;
-		virtual void PdfWe(Float& pdfA, Float& pdfW) const = 0;
+		virtual void PdfWe(const Vector3f& dir, Float& pdfA, Float& pdfW) const = 0;
 
 		Film* GetFilm() const;
 	};
@@ -32,6 +32,7 @@ namespace pol {
 		//projection transform
 		Transform projection;
 		Vector3f dxCamera, dyCamera;
+		Float near, far;
 		Float area;
 
 	public:

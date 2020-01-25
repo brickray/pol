@@ -13,7 +13,7 @@ namespace pol {
 		virtual RayDifferential GenerateRayDifferential(const Vector2f& cameraSample, const Vector2f& dofSample) const;
 
 		virtual void SampleWe(const Vector3f& pos, Vector3f& we, Ray& shadowRay, Float& pdf, Vector2i& pRaster) const;
-		virtual Float PdfWe() const;
+		virtual void PdfWe(const Vector3f& dir, Float& pdfA, Float& pdfW) const;
 
 		//return a human-readable string summary
 		virtual string ToString() const;

@@ -39,8 +39,8 @@ namespace pol {
 		Float fov = props.GetFloat("fov", 60);
 		int xRes = props.GetInt("xRes", 512);
 		int yRes = props.GetInt("yRes", 512);
-		Float near = props.GetFloat("near", 0.1);
-		Float far = props.GetFloat("far", 100);
+		near = props.GetFloat("near", 0.1);
+		far = props.GetFloat("far", 100);
 		projection = Perspective(fov, Float(xRes) / yRes, near, far);
 
 		//compute sensor area

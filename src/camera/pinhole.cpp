@@ -69,8 +69,9 @@ namespace pol {
 		Vector3f pCamera = view.TransformPoint(pos);
 		Vector3f dir = pCamera;
 		Vector3f ndir = Normalize(dir);
-		shadowRay = Ray(Vector3f::Zero(), ndir, Epsilon, dir.Length() - Epsilon);
-		shadowRay = view.TransformRay(shadowRay);
+		Float length = dir.Length();
+		shadowRay = Ray(Vector3f::Zero(), ndir, Epsilon, length - Epsilon);
+		shadowRay = view.TransformRayInverse(shadowRay);
 
 		Vector3f pNDC = projection.TransformPoint(ndir);
 		if (pNDC.X() < -1 || pNDC.X() > 1 ||
@@ -80,14 +81,20 @@ namespace pol {
 			pdf = 0;
 			return;
 		}
+		Vector2f screen = (Vector2f(pNDC.X(), pNDC.Y()) + Float(1)) * Float(0.5) * film->res;
+		screen.x = Clamp(screen.x, Float(0), Float(film->res.x - 1));
+		screen.y = Clamp(screen.y, Float(0), Float(film->res.y - 1));
 
 		Float costheta = Dot(ndir, Vector3f(0, 0, -1));
-		we = 1 / (area * costheta);
-		pdf = 1 / area;
+		we = near * near / (area * costheta * costheta * costheta * costheta);
+		pdf = length * length / costheta;
+		pRaster = screen;
 	}
 
-	Float Pinhole::PdfWe() const {
-
+	void Pinhole::PdfWe(const Vector3f& dir, Float& pdfA, Float& pdfW) const {
+		Float costheta = Dot(dir, Vector3f(0, 0, -1));
+		pdfA = 1;
+		pdfW = near * near / (area * costheta * costheta * costheta);
 	}
 
 	string Pinhole::ToString() const {
