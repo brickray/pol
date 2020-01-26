@@ -171,5 +171,7 @@ namespace pol {
 		}
 
 		scene.Prepare(lightSampleStrategy);
+
+		return true;
 	}
 }
