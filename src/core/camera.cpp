@@ -29,10 +29,18 @@ namespace pol {
 		delete film;
 	}
 
+	Vector3f Camera::GetPosition() const {
+		Matrix3 rotate = Matrix3(view.m);
+		rotate = rotate.Inverse();
+		Matrix4 rotate4x4 = Matrix4(rotate);
+		Matrix4 translate = rotate4x4 * view.m;
+
+		return Vector3f(-translate.m[0][3], -translate.m[1][3], -translate.m[2][3]);
+	}
+
 	Film* Camera::GetFilm() const {
 		return film;
 	}
-
 
 	ProjectionCamera::ProjectionCamera(const PropSets& props, Scene& scene)
 		:Camera(props, scene) {

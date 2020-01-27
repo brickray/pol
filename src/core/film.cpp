@@ -7,10 +7,11 @@ namespace pol {
 		:filename(filename), res(res), tonemap(tonemap), scale(scale) {
 		//resize image buffer
 		image.resize(res.x * res.y);
+		locks = new mutex[res.x * res.y];
 	}
 
 	Film::~Film() {
-
+		delete[] locks;
 	}
 
 	void Film::AddPixel(int p, const Vector3f& c) {
@@ -29,6 +30,7 @@ namespace pol {
 	void Film::AddSample(int p, const Vector3f& c) {
 		POL_ASSERT(p < res.x * res.y);
 
+		lock_guard<mutex> lock(locks[p]);
 		image[p] += c;
 	}
 
@@ -36,6 +38,7 @@ namespace pol {
 		POL_ASSERT(p.x < res.x && p.y < res.y);
 
 		int pix = p.y * res.x + p.x;
+		lock_guard<mutex> lock(locks[pix]);
 		image[pix] += c;
 	}
 

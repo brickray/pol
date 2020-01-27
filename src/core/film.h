@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../pol.h"
+#include <mutex>
 
 namespace pol {
 	class Film {
@@ -14,6 +15,8 @@ namespace pol {
 		//image data
 		vector<Vector3f> image;
 		Float scale;
+
+		mutex* locks;
 
 	public:
 		Film(const string& filename, const Vector2i& res, string tonemap, Float scale);
