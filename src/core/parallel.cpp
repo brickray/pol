@@ -86,6 +86,7 @@
 
 namespace pol {
 	vector<thread*> Parallel::threads;
+	int Parallel::maxThreads = 0;
 	atomic<int> activeThreads = 0;
 	mutex taskBarrier, reportBarrier;
 	int nTasks;
@@ -116,7 +117,7 @@ namespace pol {
 	}
 
 	void Parallel::Startup() {
-		int nCores = GetNumSystemCores();
+		int nCores = maxThreads > 0 ? maxThreads : GetNumSystemCores();
 		threads.resize(nCores);
 		for (int i = 0; i < nCores; ++i) {
 			threads[i] = new thread(ThreadEntry, i);
@@ -146,6 +147,10 @@ namespace pol {
 
 	void Parallel::WaitUntilTaskFinish() {
 		while (!Parallel::IsFinish());
+	}
+
+	void Parallel::SetNumWorkingThreads(int n) {
+		maxThreads = n;
 	}
 
 	int Parallel::GetNumSystemCores() {

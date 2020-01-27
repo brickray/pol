@@ -10,6 +10,7 @@ namespace pol {
 	class Parallel {
 	private:
 		static vector<thread*> threads;
+		static int maxThreads;
 
 	public:
 		static void Startup();
@@ -18,6 +19,7 @@ namespace pol {
 		static bool IsFinish();
 		static void WaitUntilTaskFinish();
 
+		static void SetNumWorkingThreads(int n);
 		static int GetNumSystemCores();
 	};
 }
