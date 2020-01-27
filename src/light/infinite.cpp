@@ -79,12 +79,31 @@ namespace pol {
 		//transformation should not contain scale component
 		dir = world.TransformVector(dir);
 		rad = image.Lookup(uv);
+		//p(w) = p(theta, phi) / sintheta = p(u, v) / (TWOPI * sintheta)
 		pdf /= (TWOPI * PI * sintheta);
 		shadowRay = Ray(isect.p, dir);
 	}
 
 	void Infinite::SampleLight(const Vector2f& posSample, const Vector2f& dirSample, Vector3f& rad, Vector3f& nor, Ray& emitRay, Float& pdfA, Float& pdfW) const {
-
+		Vector2f uv = distribution.SampleContinuous(dirSample, pdfW);
+		Float theta = uv.y * PI;
+		Float phi = uv.x * TWOPI;
+		Float sintheta = sin(theta);
+		if (sintheta == 0) {
+			pdfW = 0;
+			return;
+		}
+		Vector3f dir = SphericalCoordinate(theta, phi);
+		dir = world.TransformVector(dir);
+		Frame frame(-dir);
+		Vector2f diskPos = Warp::ConcentricDisk(posSample) * radius;
+		Vector3f pos = frame.ToWorld(Vector3f(diskPos.x, 0, diskPos.y));
+		pos += radius * dir + center;
+		rad = image.Lookup(uv);
+		nor = -dir;
+		emitRay = Ray(pos, nor);
+		pdfW /= (TWOPI * PI * sintheta);
+		pdfA = 1 / (PI * radius * radius);
 	}
 
 	Float Infinite::Pdf(const Intersection& isect, const Vector3f& pOnSurface) const {
@@ -96,6 +115,7 @@ namespace pol {
 		Float v = theta * INVPI;
 		Float sintheta = sin(theta);
 		if (sintheta == 0) return 0;
+		//p(w) = p(theta, phi) / sintheta = p(u, v) / (TWOPI * sintheta)
 		return distribution.Pdf(Vector2f(u, v)) / (TWOPI * PI * sintheta);
 	}
 

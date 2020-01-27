@@ -73,17 +73,19 @@ namespace pol {
 		shadowRay = Ray(Vector3f::Zero(), ndir, Epsilon, length - Epsilon);
 		shadowRay = view.TransformRayInverse(shadowRay);
 
+		Vector2f res = film->res;
+		Vector2f invRes = Float(1) / res;
 		Vector3f pNDC = projection.TransformPoint(ndir);
-		if (pNDC.X() < -1 || pNDC.X() > 1 ||
-			pNDC.Y() < -1 || pNDC.Y() > 1) {
+		if (pNDC.X() < -(1 + invRes.x) || pNDC.X() > (1 - invRes.x) ||
+			pNDC.Y() < -(1 + invRes.y) || pNDC.Y() > (1 - invRes.y)) {
 			//ray can not hit the sensor plane
 			//no contribution
 			pdf = 0;
 			return;
 		}
-		Vector2f screen = (Vector2f(pNDC.X(), pNDC.Y()) + Float(1)) * Float(0.5) * film->res;
-		screen.x = Clamp(screen.x, Float(0), Float(film->res.x - 1));
-		screen.y = Clamp(screen.y, Float(0), Float(film->res.y - 1));
+		Vector2f screen = (Vector2f(pNDC.X(), pNDC.Y()) + Float(1)) * Float(0.5) * res + Float(0.5);
+		screen.x = Clamp(screen.x, Float(0), Float(res.x - 1));
+		screen.y = Clamp(screen.y, Float(0), Float(res.y - 1));
 
 		Float costheta = Dot(ndir, Vector3f(0, 0, -1));
 		we = near * near / (area * costheta * costheta * costheta * costheta);

@@ -45,6 +45,24 @@ namespace pol {
 				for (int j = sy; j < ey; ++j) {
 					samplerClone->Prepare(j * film->res.x + i);
 					for (int s = 0; s < nSamples; ++s) {
+						//get radiance directly from light 
+						Vector2f offset = samplerClone->Next2D() - Vector2f(0.5);
+						Vector2f sample = Vector2f(i, j) + offset;
+						RayDifferential primaryRay = camera->GenerateRayDifferential(sample, samplerClone->Next2D());
+						Intersection lightIsect;
+						if (scene.Intersect(primaryRay, lightIsect)) {
+							if (lightIsect.light) {
+								film->AddSample(Vector2i(i, j), lightIsect.light->Le(-primaryRay.d, lightIsect.n));
+							}
+						}
+						else {
+							//has infinite light
+							Light* light = scene.GetInfiniteLight();
+							if (light) {
+								film->AddSample(Vector2i(i, j), light->Le(-primaryRay.d, Vector3f::Zero()));
+							}
+						}
+
 						int lightIndex = lightDistribution->SampleDiscrete(samplerClone->Next1D());
 						Float choicePdf = lightDistribution->DiscretePdf(lightIndex);
 						Light* light = scene.GetLight(lightIndex);
@@ -53,15 +71,6 @@ namespace pol {
 						Ray emitRay;
 						light->SampleLight(samplerClone->Next2D(), samplerClone->Next2D(), radiance, normal, emitRay, pdfW, pdfA);
 						Vector3f beta = radiance * fabs(Dot(normal, emitRay.d)) / (pdfA * pdfW * choicePdf);
-
-						Ray shadowRay;
-						Vector3f we;
-						Float cameraPdf;
-						Vector2i pRaster;
-						camera->SampleWe(emitRay.o, we, shadowRay, cameraPdf, pRaster);
-						if (cameraPdf != 0.f && !scene.Occluded(shadowRay)) {
-							film->AddSample(pRaster, radiance);
-						}
 
 						Intersection isect;
 						Ray ray = emitRay;
