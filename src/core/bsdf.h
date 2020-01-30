@@ -135,26 +135,31 @@ namespace pol {
 	//theta = acos(sqrt(1-u1)/(u1*(alpha^2-1)+1))
 	//phi = 2pi*u2
 	__forceinline Vector3f SampleWh(const Vector2f& u, Float alphaX, Float alphaY) {
-		if (alphaX == alphaY) {
-			//isotropic
-			Float theta = acos(sqrt((1 - u.x) / (u.x * (alphaX * alphaX - 1) + 1)));
-			Float phi = TWOPI * u.y;
-			
-			return SphericalCoordinate(theta, phi);
-		}
-		else {
-			//anisotropic
-			Float phi;
-			if (u.y <= 0.25) phi = atan(alphaY / alphaX * tan(TWOPI * u.y));
-			else if (u.y >= 0.75f) phi = atan(alphaY / alphaX * tan(TWOPI * u.y)) + TWOPI;
-			else phi = atan(alphaY / alphaX * tan(TWOPI * u.y)) + PI;
-			Float sinphi = sin(phi);
-			Float sinphi2 = sinphi * sinphi;
-			Float cosphi2 = 1.0f - sinphi2;
-			Float inverseA = 1.0f / (cosphi2 / (alphaX * alphaX) + sinphi2 / (alphaY * alphaY));
-			Float theta = atan(sqrt(inverseA * u.x / (1.0f - u.x)));
-			return SphericalCoordinate(theta, phi);
-		}
+		//if (alphaX == alphaY) {
+		//	//isotropic
+		//	Float theta = acos(sqrt((1 - u.x) / (u.x * (alphaX * alphaX - 1) + 1)));
+		//	Float phi = TWOPI * u.y;
+		//	
+		//	return SphericalCoordinate(theta, phi);
+		//}
+		//else {
+		//	//anisotropic
+		//	Float phi;
+		//	if (u.y <= 0.25) phi = atan(alphaY / alphaX * tan(TWOPI * u.y));
+		//	else if (u.y >= 0.75f) phi = atan(alphaY / alphaX * tan(TWOPI * u.y)) + TWOPI;
+		//	else phi = atan(alphaY / alphaX * tan(TWOPI * u.y)) + PI;
+		//	Float sinphi = sin(phi);
+		//	Float sinphi2 = sinphi * sinphi;
+		//	Float cosphi2 = 1.0f - sinphi2;
+		//	Float inverseA = 1.0f / (cosphi2 / (alphaX * alphaX) + sinphi2 / (alphaY * alphaY));
+		//	Float theta = atan(sqrt(inverseA * u.x / (1.0f - u.x)));
+		//	return SphericalCoordinate(theta, phi);
+		//}
+
+		//uniform sample in disk
+		Vector2f P = Warp::ConcentricDisk(u);
+		Vector3f N = Vector3f(P.x, sqrt(Max(0.0, 1.0 - P.x * P.x - P.y * P.y)), P.y);
+		return Normalize(Vector3f(alphaX * N.X(), Max(Float(0), N.Y()), alphaY * N.Z()));
 	}
 
 	__forceinline Vector3f SampleWhVNDF(const Vector3f& in, const Vector2f& u, Float alphaX, Float alphaY) {
@@ -166,15 +171,12 @@ namespace pol {
 		Vector3f T1 = lensq > 0 ? Vector3f(-V.Y(), V.X(), 0) / sqrt(lensq) : Vector3f::Right();
 		Vector3f T2 = Cross(V, T1);
 
-		////sample point with polar coordinates (r, phi)
-		Float r = sqrt(u.x);
-		Float phi = TWOPI * u.y;
-		Float P1 = r * cos(phi);
-		Float P2 = r * sin(phi);
+		//uniform sample in disk
+		Vector2f P = Warp::ConcentricDisk(u);
 		Float s = 0.5 * (1 + V.Y());
-		P2 = (1 - s) * sqrt(1 - P1 * P1) + s * P2;
+		P.y = (1 - s) * sqrt(1 - P.x * P.x) + s * P.y;
 
-		Vector3f N = P1 * T1 + P2 * T2 + sqrt(Max(0.0, 1.0 - P1 * P1 - P2 * P2)) * V;
+		Vector3f N = P.x * T1 + P.y * T2 + sqrt(Max(0.0, 1.0 - P.x * P.x - P.y * P.y)) * V;
 
 		return Normalize(Vector3f(alphaX * N.X(), Max(Float(0), N.Y()), alphaY * N.Z()));
 	}
