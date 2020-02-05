@@ -39,7 +39,7 @@ namespace pol {
 			pyramid[0].data[i] = data[i];
 
 		//does not need generate mipmap if the trilinear filter does not choice
-		if (fmode != FilterMode::E_TRILINEAR) return;
+		if (fmode < FilterMode::E_TRILINEAR) return;
 
 		for (int level = 1; level < nLevel; ++level) {
 			int prevW = pyramid[level - 1].w;
@@ -115,7 +115,8 @@ namespace pol {
 			color = triangle(0, uv);
 			break;
 		}
-		case FilterMode::E_TRILINEAR: {
+		case FilterMode::E_TRILINEAR:
+		default:{
 			//compute mipmap level for trilinear filtering
 			Float level = PyramidCount() - 1 + Log2(Max(width, Float(1e-8)));
 
@@ -143,10 +144,29 @@ namespace pol {
 
 	Vector3f Mipmap::Lookup(const Intersection& isect) const {
 		Vector2f uv = getTexCoordinate(isect.uv);
-		Float width = Max(Max(abs(isect.dudx), abs(isect.dudy)),
-			Max(abs(isect.dvdx), abs(isect.dvdy)));
-		
-		return Lookup(uv, width);
+		if (fmode != FilterMode::E_EWA) {
+		Trilinear:
+			Float width = Max(Max(abs(isect.dudx), abs(isect.dudy)),
+				Max(abs(isect.dvdx), abs(isect.dvdy)));
+
+			return Lookup(uv, width);
+		}
+
+		//EWA
+		Vector2f d1(isect.dudx, isect.dudy);
+		Vector2f d2(isect.dvdx, isect.dvdy);
+		if (d1.LengthSquare() < d2.LengthSquare())
+			swap(d1, d2);
+		Float majorLength = d1.Length();
+		Float minorLength = d2.Length();
+		if (minorLength == 0) {
+			//do trilinear
+			goto Trilinear;
+		}
+
+		Float lod = Max(Float(0), PyramidCount() - Float(1) + Log2(minorLength));
+		int ilod = floor(lod);
+		return Lerp(ewa(ilod, uv, d1, d2), ewa(ilod + 1, uv, d1, d2), lod - ilod);
 	}
 
 	Vector2f Mipmap::getTexCoordinate(const Vector2f& uv) const {
@@ -183,6 +203,46 @@ namespace pol {
 		 	 + (1 - dy) * dx * ti.data[y * ti.w + nextX]
 			 + dy * (1 - dx) * ti.data[nextY * ti.w + x]
 			 + dy * dx * ti.data[nextY * ti.w + nextX];
+	}
+
+
+	Vector3f Mipmap::ewa(int level, const Vector2f& uv, const Vector2f& d1, const Vector2f& d2) const {
+		TexInfo ti = pyramid[level];
+
+		Float A = d1.LengthSquare();
+		Float B = 2 * (d1.x * d2.x + d1.y * d2.y);
+		Float C = d2.LengthSquare();
+		Float F = 1;
+		Float theta = atan(B / (A - C)) * 0.5;
+		Float costheta = cos(theta);
+		Float sintheta = sin(theta);
+		Float det = (A - C) * (A - C) + B * B;
+		Float APrime = 0.5 * (A + C - sqrt(det));
+		Float CPrime = 0.5 * (A + C + sqrt(det));
+		Float x = Max(APrime * costheta, CPrime * sintheta);
+		Float y = Max(APrime * sintheta, CPrime * costheta);
+		int ss = floor(uv.x * ti.w);
+		int tt = floor(uv.y * ti.h);
+		int xx = floor(x * ti.w);
+		int yy = floor(y * ti.h);
+		Vector3f sum = 0;
+		Float sumWeights = 0;
+		for (int i = -xx + ss; i <= xx + ss; i++) {
+			if (i < 0 || i >= ti.w) continue;
+			for (int j = -yy + tt; j <= yy + tt; j++) {
+				if (j < 0 || j >= ti.h) continue;
+				Float s = Float(i - ss) / ti.w;
+				Float t = Float(j - tt) / ti.h;
+				Float r2 = A * s * s + B * s * t + C * t * t;
+				if (r2 < 1) {
+					Float weight = 1;// exp(-2 * r2) - exp(-2);
+					sum += ti.data[j * ti.w + i] * weight;
+					sumWeights += weight;
+				}
+			}
+		}
+
+		return sum /= sumWeights;
 	}
 
 	void Mipmap::WritePyramid(const string& directory) const {

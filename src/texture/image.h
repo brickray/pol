@@ -25,7 +25,8 @@ namespace pol {
 			if (filtermode == "nearst") fmode = FilterMode::E_NEARST;
 			else if (filtermode == "linear") fmode = FilterMode::E_LINEAR;
 			else if (filtermode == "trilinear") fmode = FilterMode::E_TRILINEAR;
-			else fmode = FilterMode::E_TRILINEAR;
+			else if (filtermode == "ewa") fmode = FilterMode::E_EWA;
+			else fmode = FilterMode::E_EWA;
 
 			WrapMode wmode;
 			if (wrapmode == "clamp") wmode = WrapMode::E_CLAMP;

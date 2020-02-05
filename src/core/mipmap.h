@@ -34,6 +34,7 @@ namespace pol {
 		E_NEARST,
 		E_LINEAR,  //bilinear
 		E_TRILINEAR, //trilinear(mipmap)
+		E_EWA,
 	};
 
 	struct TexInfo {
@@ -64,5 +65,6 @@ namespace pol {
 	private:
 		Vector2f getTexCoordinate(const Vector2f& uv) const;
 		Vector3f triangle(int level, const Vector2f& uv) const;
+		Vector3f ewa(int level, const Vector2f& uv, const Vector2f& d1, const Vector2f& d2) const;
 	};
 }
