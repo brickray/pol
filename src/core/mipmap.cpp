@@ -153,8 +153,8 @@ namespace pol {
 		}
 
 		//EWA
-		Vector2f d1(isect.dudx, isect.dudy);
-		Vector2f d2(isect.dvdx, isect.dvdy);
+		Vector2f d1(isect.dudx, isect.dvdx);
+		Vector2f d2(isect.dudy, isect.dvdy);
 		if (d1.LengthSquare() < d2.LengthSquare())
 			swap(d1, d2);
 		Float majorLength = d1.Length();
@@ -206,21 +206,27 @@ namespace pol {
 	}
 
 
-	Vector3f Mipmap::ewa(int level, const Vector2f& uv, const Vector2f& d1, const Vector2f& d2) const {
+	Vector3f Mipmap::ewa(int level, const Vector2f& uv, const Vector2f& duvx, const Vector2f& duvy) const {
 		TexInfo ti = pyramid[level];
 
-		Float A = d1.LengthSquare();
-		Float B = 2 * (d1.x * d2.x + d1.y * d2.y);
-		Float C = d2.LengthSquare();
-		Float F = 1;
-		Float theta = atan(B / (A - C)) * 0.5;
+		Float APrime = duvx.y * duvx.y + duvy.y * duvy.y;
+		Float BPrime = -2 * (duvx.x * duvx.y + duvy.x * duvy.y);
+		Float CPrime = duvx.x * duvx.x + duvy.x * duvy.x;
+		Float t = (duvx.x * duvy.y - duvy.x * duvx.y);
+		Float F = 1 / (t * t);
+		APrime *= F;
+		BPrime *= F;
+		CPrime *= F;
+		Float theta = atan(BPrime / (APrime - CPrime)) * 0.5;
 		Float costheta = cos(theta);
 		Float sintheta = sin(theta);
-		Float det = (A - C) * (A - C) + B * B;
-		Float APrime = 0.5 * (A + C - sqrt(det));
-		Float CPrime = 0.5 * (A + C + sqrt(det));
-		Float x = Max(APrime * costheta, CPrime * sintheta);
-		Float y = Max(APrime * sintheta, CPrime * costheta);
+		Float det = (APrime - CPrime) * (APrime - CPrime) + BPrime * BPrime;
+		Float A = 0.5 * (APrime + CPrime - sqrt(det));
+		Float C = 0.5 * (APrime + CPrime + sqrt(det));
+		Float a = 1 / sqrt(A);
+		Float b = 1 / sqrt(C);
+		Float x = Max(a * costheta, b * sintheta);
+		Float y = Max(a * sintheta, b * costheta);
 		int ss = floor(uv.x * ti.w);
 		int tt = floor(uv.y * ti.h);
 		int xx = floor(x * ti.w);
@@ -233,7 +239,7 @@ namespace pol {
 				if (j < 0 || j >= ti.h) continue;
 				Float s = Float(i - ss) / ti.w;
 				Float t = Float(j - tt) / ti.h;
-				Float r2 = A * s * s + B * s * t + C * t * t;
+				Float r2 = APrime * s * s + BPrime * s * t + CPrime * t * t;
 				if (r2 < 1) {
 					Float weight = 1;// exp(-2 * r2) - exp(-2);
 					sum += ti.data[j * ti.w + i] * weight;
