@@ -52,7 +52,7 @@ namespace pol {
 		Frame frame(direction);
 		dir = frame.ToWorld(dir);
 
-		rad = radiance;
+		rad = radiance * getFalloff(Dot(dir, direction));
 		nor = dir;
 		emitRay = Ray(position, dir);
 		pdfA = 1;
